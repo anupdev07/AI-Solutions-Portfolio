@@ -1,6 +1,34 @@
-const express = require('express');
-const app = express();
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
+const express = require('express');
+const connectDB = require('./config/db');
+const cors = require('cors');
+
+
+// Initialize app
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Sample test route
+app.get('/', (req, res) => {
+  res.send('API is working 🚀');
+});
+
+// Routes (to be expanded)
+app.use('/api', require('./routes/index'));
+
+const PORT = process.env.PORT || 5000;
+const start=async ()=>{
+  try {
+
+    await connectDB(process.env.MONGO_URI);
+    app.listen(PORT, () => {
+  console.log(`Server running on url http://localhost:${PORT}`);
+});
+  } catch (error) {
+    
+  }
+}
+start();
 
