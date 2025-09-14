@@ -1,0 +1,94 @@
+:root {
+  --baby-powder: #fffffa;
+  --davys-gray: #515052;
+  --black: #000103;
+  --jet: #333138;
+  --vermilion: #ff312e;
+}
+
+
+body {
+  background-color: var(--black);
+  color: var(--baby-powder);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.9;
+}
+
+/* Navbar */
+.navbar-custom {
+  background-color: var(--black);
+    border-bottom: 2px solid var(--davys-gray);
+}
+
+#loginbtn {
+  border: 0.6px solid var(--baby-powder);
+  border-radius: 48px;
+  padding: 0px 10px;
+  margin-left: 350px ;
+}
+
+.navbar-custom .nav-link {
+  color: var(--baby-powder);
+  
+}
+
+.navbar-custom .nav-link:hover {
+  color: var(--vermilion);
+
+}
+
+/* Buttons */
+.btn-custom {
+  background-color: var(--vermilion);
+  color: var(--baby-powder);
+  transition: 0.3s;
+  
+}
+
+.btn-custom:hover {
+  background-color: #d82b28;
+  color: var(--baby-powder);
+  
+}
+
+/* Cards */
+.card-custom {
+  background-color: rgba(49, 48, 51, 0.315);;
+   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  color: var(--baby-powder);
+}
+
+.input-group-text {
+  background-color: var(--davys-gray);
+  color: var(--baby-powder);
+  border: none;
+}
+
+.form-control {
+  background-color: var(--black);
+  color: var(--baby-powder);
+  border: 1px solid var(--davys-gray);
+}
+
+.form-control::placeholder {
+  color: #bdbdbd;
+}
+
+.form-control:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--vermilion);
+  border-color: var(--vermilion);
+}

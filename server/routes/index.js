@@ -1,8 +1,12 @@
-const express = require('express');
+const express = require("express");
+const authRoutes = require("./authRoutes");
+
 const router = express.Router();
 
-router.get('/ping', (req, res) => {
-  res.json({ message: 'pong' });
+router.use("/auth", authRoutes);
+
+router.get("/ping", (req, res) => {
+  res.json({ message: "pong" });
 });
 
 module.exports = router;

@@ -3,8 +3,8 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 
-function Login() {
-  const [form, setForm] = useState({ email: "", password: "" });
+function Register() {
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,12 +14,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/");
+      await axios.post("http://localhost:5000/api/auth/register", form);
+      alert("Registration successful!");
+      navigate("/login");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+      alert(err.response?.data?.message || "Registration failed");
     }
   };
 
@@ -28,12 +27,14 @@ function Login() {
       <div className="col-md-6 col-lg-4">
         <div className="card card-custom p-4">
           <div className="text-center mb-4">
-           
             <img src={logo} alt="Logo" style={{ width: "150px" }} />
-            
             
           </div>
           <form onSubmit={handleSubmit}>
+            <div className="mb-3 input-group">
+              <span className="input-group-text"><i className="bi bi-person"></i></span>
+              <input className="form-control" name="username" placeholder="Username" onChange={handleChange} required />
+            </div>
             <div className="mb-3 input-group">
               <span className="input-group-text"><i className="bi bi-envelope"></i></span>
               <input className="form-control" name="email" type="email" placeholder="Email" onChange={handleChange} required />
@@ -42,10 +43,10 @@ function Login() {
               <span className="input-group-text"><i className="bi bi-lock"></i></span>
               <input className="form-control" name="password" type="password" placeholder="Password" onChange={handleChange} required />
             </div>
-            <button type="submit" className="btn btn-custom w-100">Login</button>
+            <button type="submit" className="btn btn-custom w-100">Register</button>
           </form>
           <div className="text-center mt-3">
-            <p>New user? <Link to="/register" style={{ color: "var(--vermilion)" }}>Create an account</Link></p>
+            <p>Already have an account? <Link to="/login" style={{ color: "var(--vermilion)" }}>Login</Link></p>
           </div>
         </div>
       </div>
@@ -53,4 +54,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
