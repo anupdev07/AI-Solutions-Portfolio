@@ -10,7 +10,7 @@ function Home() {
         {/* Left: Big Heading + CTA */}
         <div className="col-md-6 mb-4">
           <h1 className="fw-bold display-5" style={{ color: "var(--baby-powder)" }}>
-            Shape your <br /> career at AI-Solutions
+            SkyRocket <br /> business with AI-Solutions
           </h1>
           <p className="mt-3" style={{ color: "var(--davys-gray)", fontSize: "1.1rem" }}>
             We're reimagining the IT and AI industry, and we need exceptional people 
@@ -46,7 +46,7 @@ function Home() {
           <img src="/src/assets/company2.png" alt="Company 2" />
           <img src="/src/assets/company3.png" alt="Company 3" />
           <img src="/src/assets/company4.png" alt="Company 4" />
-          <img src="/src/assets/company6.png" alt="Company 5" />
+          <img src="/src/assets/company5.png" alt="Company 5" />
           <img src="/src/assets/company6.png" alt="Company 5" />
         </div>
         {/* Duplicate for infinite loop */}
@@ -55,7 +55,7 @@ function Home() {
           <img src="/src/assets/company2.png" alt="Company 2" />
           <img src="/src/assets/company3.png" alt="Company 3" />
           <img src="/src/assets/company4.png" alt="Company 4" />
-          <img src="/src/assets/company6.png" alt="Company 5" />
+          <img src="/src/assets/company5.png" alt="Company 5" />
           <img src="/src/assets/company6.png" alt="Company 5" /> 
         </div>
       </div>

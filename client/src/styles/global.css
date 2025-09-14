@@ -141,17 +141,33 @@ a:hover {
 
 .logos-slide img {
   height: 60px;
-  filter: grayscale(100%) brightness(2);
+  filter: grayscale(100%);
+  
   opacity: 0.8;
   transition: 0.3s;
 }
 
+.home-container .row {
+  border-bottom: 0.1px solid var(--davys-gray);
+}
 .logos-slide img:hover {
   filter: grayscale(0);
-  opacity: 1;
+  opacity: 1
 }
 
 @keyframes scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-100%); }
+}
+
+.contact-container {
+  padding: 60px 20px;
+}
+
+.contact-container h2 {
+  font-size: 1.8rem;
+}
+
+.contact-container .card-custom {
+  background-color: var(--jet);
 }
