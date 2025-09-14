@@ -5,6 +5,7 @@ import App from "./App";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Contact from "./pages/Contact";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/global.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
       </Routes>
     </BrowserRouter>

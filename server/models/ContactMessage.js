@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const ContactMessageSchema = new mongoose.Schema(
   {
@@ -10,4 +10,4 @@ const ContactMessageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("ContactMessage", ContactMessageSchema);
+module.exports = mongoose.model("ContactMessage", ContactMessageSchema);

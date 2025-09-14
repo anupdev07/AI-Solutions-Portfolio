@@ -4,6 +4,7 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
+const contactRoutes = require("./routes/contact.js");
 
 // Initialize app
 const app = express();
@@ -17,12 +18,7 @@ app.get('/', (req, res) => {
 
 // Routes (to be expanded)
 app.use('/api', require('./routes/index'));
-
-import contactRoutes from "./routes/contact.js";
-
 app.use("/api/contact", contactRoutes);
-
-
 const PORT = process.env.PORT || 5000;
 const start=async ()=>{
   try {
