@@ -5,16 +5,23 @@ const connectDB = require('./config/db');
 const cors = require('cors');
 
 const contactRoutes = require("./routes/contact.js");
+const blogRoutes = require("./routes/blogs.js");
+
+const path = require("path");
+
 
 // Initialize app
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static files for images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Sample test route
 app.get('/', (req, res) => {
   res.send('API is working 🚀');
 });
+
 
 // Routes (to be expanded)
 app.use('/api', require('./routes/index'));

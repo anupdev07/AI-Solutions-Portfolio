@@ -136,13 +136,12 @@ a:hover {
 .logos-slide {
   display: flex;
   gap: 60px;
-  animation: scroll 16s linear infinite;
+  animation: scroll 20s linear infinite;
 }
 
 .logos-slide img {
-  height: 60px;
+  height: 50px;
   filter: grayscale(100%);
-  
   opacity: 0.8;
   transition: 0.3s;
 }
@@ -152,6 +151,7 @@ a:hover {
 }
 .logos-slide img:hover {
   filter: grayscale(0);
+
   opacity: 1
 }
 

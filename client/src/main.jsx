@@ -9,6 +9,9 @@ import Contact from "./pages/Contact";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/global.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import AdminPanel from "./pages/AdminPanel.jsx";
+
+<Route path="admin" element={<AdminPanel />} />
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
