@@ -17,14 +17,16 @@ function Login() {
       const res = await axios.post("http://localhost:5000/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      if (user.role === "admin") {
-        navigate("/admin"); // Admin panel
-      } else {
-        navigate("/"); // Normal homepage
+      alert(`Successfully logged in as ${res.data.user.role}`); 
+      if(res.data.user.role === "admin") {
+        navigate("/admin");
+        return;
       }
+      navigate("/");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
+  
   };
 
   return (
