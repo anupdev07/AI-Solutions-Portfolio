@@ -23,6 +23,12 @@ app.get('/', (req, res) => {
 });
 
 
+
+
+app.use("/api/blogs", blogRoutes);
+app.use("/api/contact", contactRoutes);
+
+
 // Routes (to be expanded)
 app.use('/api', require('./routes/index'));
 app.use("/api/contact", contactRoutes);
