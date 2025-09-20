@@ -31,8 +31,10 @@ function Login() {
   };
 
   return (
+    
     <div className="row justify-content-center">
-      <div className="col-md-6 col-lg-4">
+        
+            <div className="col-md-6 col-lg-4">
         <div className="card card-custom p-4">
           <div className="text-center mb-4">
            

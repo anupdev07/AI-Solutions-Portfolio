@@ -6,10 +6,13 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Services from "../pages/Services";
-import Blog from "../pages/Blog";
 import Events from "../pages/Events";
 import Contact from "../pages/Contact";
 import AdminPanel from "../pages/AdminPanel";
+import BlogList from "../pages/BlogList";
+import BlogDetail from "../pages/BlogDetail";
+
+
 
 export default function AppRoutes() {
   let user = null;
@@ -41,12 +44,16 @@ export default function AppRoutes() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="services" element={<Services />} />
-        <Route path="blog" element={<Blog />} />
+        
         <Route path="events" element={<Events />} />
         <Route path="contact" element={<Contact />} />
+       
         {/* fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
+         <Route path="blog" element={<BlogList />} />
       </Route>
+       
+        <Route path="/blog/:slug" element={<BlogDetail />} />
     </Routes>
   );
 }

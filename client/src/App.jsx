@@ -20,7 +20,7 @@ function App() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-custom">
+      <nav className="navbar navbar-expand-lg navbar-custom fixed-top">
         <div className="container-fluid d-flex justify-content-between align-items-center">
           {/* Left: Logo */}
           <Link className="navbar-brand d-flex align-items-center" to="/">
