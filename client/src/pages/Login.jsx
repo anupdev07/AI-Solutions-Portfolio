@@ -17,8 +17,9 @@ function Login() {
       const res = await axios.post("http://localhost:5000/api/auth/login", form);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      alert(`Successfully logged in as ${res.data.user.role}`); 
+      // alert(`Successfully logged in as ${res.data.user.role}`); 
       if(res.data.user.role === "admin") {
+        
         navigate("/admin");
         return;
       }

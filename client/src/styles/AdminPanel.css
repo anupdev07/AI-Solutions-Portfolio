@@ -1,0 +1,146 @@
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 220px;
+  background: #333138; /* dark theme */
+  color: #fff;
+  padding: 20px;
+  position: fixed;
+  height: 100%;
+}
+
+.admin-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.admin-sidebar li {
+  margin: 15px 0;
+}
+
+.admin-sidebar a {
+  text-decoration: none;
+  color: #fffffa;
+  font-weight: bold;
+}
+
+.admin-sidebar a:hover {
+  color: #ff312e;
+}
+
+.admin-main {
+  margin-left: 240px;
+  padding: 30px;
+  flex: 1;
+  scroll-behavior: smooth;
+  background-color: var(--black);
+}
+/* AdminPanel.css - dark, minimal */
+
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--black);
+  color: var(--baby-powder);
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 240px;
+  background-color: var(--jet);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: fixed;
+  height: 100vh;
+  box-shadow: 6px 0 20px rgba(0,0,0,0.6);
+}
+
+.admin-brand h4 {
+  color: var(--baby-powder);
+  margin: 0 0 12px 0;
+}
+
+.admin-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.admin-nav li {
+  padding: 10px 8px;
+  cursor: pointer;
+  color: var(--baby-powder);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+}
+.admin-nav li.active {
+  background: rgba(255,255,255,0.03);
+  color: var(--vermilion);
+  font-weight: 600;
+}
+
+/* Logout button */
+.btn-logout {
+  background: var(--vermilion);
+  border: none;
+  color: var(--baby-powder);
+  padding: 10px;
+  border-radius: 6px;
+}
+
+/* Main content */
+.admin-main {
+  margin-left: 260px;
+  padding: 28px;
+  flex: 1;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  background-color: var(--black);;
+}
+
+/* Card dark */
+.card-dark {
+  background: var(--davys-gray);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+  color: var(--baby-powder);
+}
+
+/* thumbnails */
+.img-thumb {
+  width: 100%;
+  max-width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.4);
+}
+
+.no-thumb {
+  width: 100%;
+  max-width: 120px;
+  height: 80px;
+  border-radius: 6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,0.03);
+  color: #999;
+}
+
+/* small helper */
+.small-muted {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+}
+
+.card.card-dark {
+  color: var(--baby-powder);
+  background: var(--black);
+}
+ 
