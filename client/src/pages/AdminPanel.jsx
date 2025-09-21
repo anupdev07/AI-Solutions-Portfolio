@@ -32,6 +32,13 @@ export default function AdminPanel() {
   const [editingId, setEditingId] = useState(null);
   const [statusMsg, setStatusMsg] = useState("");
 
+  // Services state
+  const [services, setServices] = useState([]);
+const [serviceTitle, setServiceTitle] = useState("");
+const [serviceDesc, setServiceDesc] = useState("");
+const [serviceCategory, setServiceCategory] = useState("");
+const [serviceIcon, setServiceIcon] = useState(null);
+
   const token = localStorage.getItem("token");
 
   // Guard: redirect non-admins (double-check)
@@ -50,6 +57,7 @@ export default function AdminPanel() {
   useEffect(() => {
     fetchBlogs();
     fetchInquiries();
+    fetchServices();
     // eslint-disable-next-line
   }, []);
 
@@ -161,6 +169,14 @@ export default function AdminPanel() {
   } catch (err) {
     console.error("Delete inquiry failed:", err);
     alert("Failed to delete inquiry");
+  }
+}
+async function fetchServices() {
+  try {
+    const res = await axios.get(`${API_URL}/api/services`);
+    setServices(res.data || []);
+  } catch (err) {
+    console.error("fetchServices:", err);
   }
 }
 
@@ -376,13 +392,141 @@ export default function AdminPanel() {
 )}
 
 
-        {/* Services (placeholder) */}
-        {activeTab === "services" && (
-          <section id="services-section">
-            <h2>Services Management</h2>
-            <p className="text-muted">This area will let you CRUD services later.</p>
-          </section>
-        )}
+       {/* SERVICES MANAGEMENT */}
+{activeTab === "services" && (
+  <section id="services-section">
+    <h2 className="mb-3">Services Management</h2>
+
+    {/* Create Service Form */}
+    <form
+      className="card card-dark p-3 mb-4"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setStatusMsg("Saving...");
+
+        try {
+          const formData = new FormData();
+          formData.append("title", serviceTitle);
+          formData.append("description", serviceDesc);
+          formData.append("category", serviceCategory);
+          if (serviceIcon) formData.append("icon", serviceIcon);
+
+          await axios.post(`${API_URL}/api/services`, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          setStatusMsg("Service created successfully");
+          setServiceTitle("");
+          setServiceDesc("");
+          setServiceCategory("");
+          setServiceIcon(null);
+          await fetchServices();
+        } catch (err) {
+          console.error("createService:", err);
+          setStatusMsg(err.response?.data?.msg || "Failed to save service");
+        }
+      }}
+    >
+      <div className="mb-2">
+        <input
+          className="form-control"
+          placeholder="Service Title"
+          value={serviceTitle}
+          onChange={(e) => setServiceTitle(e.target.value)}
+          required
+        />
+      </div>
+      <div className="mb-2">
+        <textarea
+          className="form-control"
+          placeholder="Service Description"
+          rows="3"
+          value={serviceDesc}
+          onChange={(e) => setServiceDesc(e.target.value)}
+          required
+        />
+      </div>
+      <div className="mb-2">
+        <input
+          className="form-control"
+          placeholder="Category (optional)"
+          value={serviceCategory}
+          onChange={(e) => setServiceCategory(e.target.value)}
+        />
+      </div>
+      <div className="mb-2">
+        <label className="form-label">Icon (optional)</label>
+        <input
+          className="form-control"
+          type="file"
+          accept="image/*"
+          onChange={(e) => setServiceIcon(e.target.files[0])}
+        />
+      </div>
+      <div className="d-flex gap-2">
+        <button type="submit" className="btn btn-primary">Create Service</button>
+        <span className="ms-auto text-muted">{statusMsg}</span>
+      </div>
+    </form>
+
+    {/* List Services */}
+    <div className="mb-5">
+      <h5 className="mb-3">All Services</h5>
+      {services.length === 0 ? (
+        <p className="text-muted">No services yet.</p>
+      ) : (
+        services.map((s) => (
+          <div
+            key={s._id}
+            className="card card-dark p-3 mb-2 d-flex align-items-center"
+          >
+            <div className="d-flex w-100 gap-3 align-items-center">
+              <div style={{ width: 80 }}>
+                {s.icon ? (
+                  <img
+                    src={`${API_URL}/uploads/blogs/${s.icon}`}
+                    alt="icon"
+                    className="img-thumb"
+                  />
+                ) : (
+                  <div className="no-thumb">No Icon</div>
+                )}
+              </div>
+              <div className="flex-grow-1">
+                <h6 className="mb-1">{s.title}</h6>
+                <p className="mb-1 small text-muted">{s.category}</p>
+                <p className="mb-0">{s.description}</p>
+                <div className="mt-2">
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={async () => {
+                      if (!window.confirm("Delete this service?")) return;
+                      try {
+                        await axios.delete(`${API_URL}/api/services/${s._id}`, {
+                          headers: { Authorization: `Bearer ${token}` },
+                        });
+                        setServices((prev) => prev.filter((srv) => srv._id !== s._id));
+                      } catch (err) {
+                        console.error("deleteService:", err);
+                        alert("Delete failed");
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+)}
+
 
         {/* Users (placeholder) */}
         {activeTab === "users" && (

@@ -9,6 +9,9 @@ const path = require("path");
 const contactRoutes = require("./routes/contact.js");
 const blogRoutes = require("./routes/blogs.js");
 const indexRoutes = require("./routes/index.js");
+const serviceRoutes = require("./routes/services.js");
+
+
 
 const app = express();
 app.use(cors());
@@ -26,7 +29,7 @@ app.get("/", (req, res) => {
 app.use("/api/blogs", blogRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api", indexRoutes);
-
+app.use("/api/services", serviceRoutes);
 // Start server
 const PORT = process.env.PORT || 5000;
 
