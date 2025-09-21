@@ -2,9 +2,11 @@ import React from "react";
 
 function Services() {
   return (
-    <div className="text-light">
-      <h1>Services Page</h1>
-      <p>All Services will appear here.</p>
+    <div className="container text-light">
+      <br></br>
+      <br></br>
+      <h1 className="mb-4">Our Services</h1>
+      <p>Services page is under construction. Please check back later!</p>
     </div>
   );
 }

@@ -32,7 +32,7 @@ function Login() {
 
   return (
     
-    <div className="row justify-content-center">
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
         
             <div className="col-md-6 col-lg-4">
         <div className="card card-custom p-4">
