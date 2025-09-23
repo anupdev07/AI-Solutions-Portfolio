@@ -1,98 +1,147 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-function Contact() {
+export default function Contact() {
+  const API_URL = "http://localhost:5000";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
-    message: ""
+    phone: "",
+    company: "",
+    country: "",
+    jobTitle: "",
+    jobDetails: "",
+    message: "",
   });
+
   const [status, setStatus] = useState("");
 
-  const handleChange = (e) => {
+  function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  }
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
     setStatus("Sending...");
 
     try {
-      await axios.post("http://localhost:5000/api/contact", formData);
-      setStatus("Your inquiry has been sent successfully!");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error) {
-      console.error(error);
-      setStatus("Something went wrong. Please try again.");
+      await axios.post(`${API_URL}/api/contact`, formData);
+      setStatus("Message sent successfully!");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        country: "",
+        jobTitle: "",
+        jobDetails: "",
+        message: "",
+      });
+    } catch (err) {
+      console.error(err);
+      setStatus("Failed to send message.");
     }
-  };
+  }
 
   return (
-    <div className="contact-container text-light">
-      <h2 className="text-center fw-bold mb-4" style={{ color: "var(--baby-powder)" }}>
-        Want to inquire? Fill out the form and we’ll get back to you via email.
-      </h2>
+    <div className="container py-5">
+      <h2 className="mb-4">Want to inquire? Fill out the form and we’ll get back to you.</h2>
+      <form className="card card-dark p-4" onSubmit={handleSubmit}>
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
 
-      <form onSubmit={handleSubmit} className="card card-custom p-4 mx-auto" style={{ maxWidth: "600px" }}>
-        <div className="mb-3">
-          <label className="form-label">Name</label>
-          <input
-            type="text"
-            className="form-control"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            placeholder="Enter your full name"
-          />
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Phone"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Company"
+              name="company"
+              value={formData.company}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Country"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="col-md-6">
+            <input
+              className="form-control"
+              placeholder="Job Title"
+              name="jobTitle"
+              value={formData.jobTitle}
+              onChange={handleChange}
+            />
+          </div>
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            className="form-control"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="Enter your email"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Subject</label>
-          <input
-            type="text"
-            className="form-control"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            required
-            placeholder="Subject of your inquiry"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Message</label>
           <textarea
             className="form-control"
-            name="message"
-            value={formData.message}
+            placeholder="Job Details"
+            name="jobDetails"
+            rows="3"
+            value={formData.jobDetails}
             onChange={handleChange}
-            rows="5"
-            required
-            placeholder="Write your message here..."
-          ></textarea>
+          />
         </div>
 
-        <button type="submit" className="btn btn-custom w-100">Submit</button>
+        <div className="mb-3">
+          <textarea
+            className="form-control"
+            placeholder="Your message"
+            name="message"
+            rows="4"
+            value={formData.message}
+            onChange={handleChange}
+          />
+        </div>
 
-        {status && <p className="mt-3 text-center">{status}</p>}
+        <button className="btn btn-primary" type="submit">
+          Send Inquiry
+        </button>
+        <p className="mt-3 text-muted">{status}</p>
       </form>
     </div>
   );
 }
-
-export default Contact;

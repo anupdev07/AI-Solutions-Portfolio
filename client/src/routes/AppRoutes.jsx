@@ -48,12 +48,13 @@ export default function AppRoutes() {
         <Route path="events" element={<Events />} />
         <Route path="contact" element={<Contact />} />
        
-        {/* fallback */}
+       
         <Route path="*" element={<Navigate to="/" replace />} />
          <Route path="blog" element={<BlogList />} />
+          <Route path="blog/:slug" element={<BlogDetail />} />
       </Route>
-       
-        <Route path="/blog/:slug" element={<BlogDetail />} />
+      
+      
     </Routes>
   );
 }

@@ -1,7 +1,7 @@
+// client/src/pages/BlogDetail.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import DOMPurify from "dompurify";
 
 export default function BlogDetail() {
   const { slug } = useParams();
@@ -22,43 +22,32 @@ export default function BlogDetail() {
     }
   }
 
-  if (!blog) return <p className="text-light">Loading...</p>;
+  if (!blog) return <p className="text-center">Loading...</p>;
 
   return (
-    <div className="container text-light">
-      <h1 className="mb-3">{blog.title}</h1>
-      <p className="text-muted small">
-        By {blog.author?.username || "Admin"} •{" "}
-        {new Date(blog.createdAt).toLocaleDateString()}
-      </p>
-
+    <div className="container py-5">
       {blog.coverImage && (
         <img
           src={`${API_URL}/uploads/blogs/${blog.coverImage}`}
-          alt={blog.title}
+          alt="cover"
           className="img-fluid mb-4 rounded shadow"
+          style={{ maxHeight: "450px", objectFit: "cover", width: "100%" }}
         />
       )}
-
+      <h1 className="mb-3">{blog.title}</h1>
+      <p className="text-muted">
+        By {blog.author?.username || "Admin"} •{" "}
+        {new Date(blog.createdAt).toLocaleDateString()}
+      </p>
       <div
-        className="blog-content"
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(blog.content || ""),
-        }}
+        className="mt-4"
+        style={{ lineHeight: "1.8", fontSize: "1.1rem" }}
+        dangerouslySetInnerHTML={{ __html: blog.content }}
       />
-
-      {blog.tags && blog.tags.length > 0 && (
-        <p className="mt-3">
-          <strong>Tags:</strong> {blog.tags.join(", ")}
-        </p>
-      )}
-
-      {/* Back button */}
-      <div className="mt-4">
-        <Link to="/blog" className="btn btn-outline-light">
-          ← Back to Blogs
-        </Link>
-      </div>
+      <hr className="my-4" />
+      <Link to="/blog" className="btn btn-outline-light">
+        ← Back to Blogs
+      </Link>
     </div>
   );
 }

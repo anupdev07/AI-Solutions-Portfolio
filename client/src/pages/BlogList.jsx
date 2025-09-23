@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-export default function BlogList() {
+export default function Blog() {
   const [blogs, setBlogs] = useState([]);
   const API_URL = "http://localhost:5000"; // backend base URL
 
@@ -20,38 +20,43 @@ export default function BlogList() {
   }
 
   return (
-    <div className="container text-light">
-      <br></br>
-<br></br>
-      <h1 className="mb-4">Our Blogs</h1>
-      {blogs.length === 0 ? (
-        <p>No blogs yet.</p>
-      ) : (
-        blogs.map((blog) => (
-          <div
-            key={blog._id}
-            className="card mb-4 p-3 shadow-lg bg-dark text-light border-0"
-          >
-            {blog.coverImage && (
-              <img
-                src={`${API_URL}/uploads/blogs/${blog.coverImage}`}
-                alt={blog.title}
-                className="img-fluid mb-3 rounded"
-                style={{ maxHeight: "300px", objectFit: "cover" }}
-              />
-            )}
-            <h3>{blog.title}</h3>
-            <p className="text-muted small">
-              By {blog.author?.username || "Admin"} •{" "}
-              {new Date(blog.createdAt).toLocaleDateString()}
-            </p>
-            <p>{blog.excerpt}</p>
-            <Link to={`/blog/${blog.slug}`} className="btn btn-outline-light">
-              Read More →
-            </Link>
-          </div>
-        ))
-      )}
+    <div className="container py-5">
+      <h1 className="text-center mb-5">Our Blogs</h1>
+      <div className="row g-4">
+        {blogs.length === 0 ? (
+          <p className="text-center">No blogs yet.</p>
+        ) : (
+          blogs.map((b) => (
+            <div key={b._id} className="col-12 col-md-6 col-lg-4">
+              <div className="card shadow h-100">
+                {b.coverImage && (
+                  <img
+                    src={`${API_URL}/uploads/blogs/${b.coverImage}`}
+                    alt="cover"
+                    className="card-img-top"
+                    style={{ maxHeight: "200px", objectFit: "cover" }}
+                  />
+                )}
+                {/* dark bootstrap card */}
+                <div className="card-body d-flex flex-column bg-dark text-white">
+                  <h5 className="card-title">{b.title}</h5>
+                  <p className="text-muted small text-white">
+                    By {b.author?.username || "Admin"} •{" "}
+                    {new Date(b.createdAt).toLocaleDateString()}
+                  </p>
+                  <p className="card-text">{b.excerpt}</p>
+                  <Link
+                    to={`/blog/${b.slug}`}
+                    className="btn btn-outline-light mt-auto"
+                  >
+                    Read More →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

@@ -159,8 +159,8 @@ const [serviceIcon, setServiceIcon] = useState(null);
     }
   }
 
-  async function handleDeleteInquiry(id) {
-  if (!window.confirm("Delete this inquiry?")) return;
+async function handleDeleteInquiry(id) {
+  if (!window.confirm("Are you sure you want to delete this inquiry?")) return;
   try {
     await axios.delete(`${API_URL}/api/contact/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -168,9 +168,10 @@ const [serviceIcon, setServiceIcon] = useState(null);
     setInquiries((prev) => prev.filter((inq) => inq._id !== id));
   } catch (err) {
     console.error("Delete inquiry failed:", err);
-    alert("Failed to delete inquiry");
   }
 }
+
+
 async function fetchServices() {
   try {
     const res = await axios.get(`${API_URL}/api/services`);
@@ -349,47 +350,28 @@ async function fetchServices() {
         )}
 
        {/* INQUIRIES */}
-{activeTab === "inquiries" && (
-  <section id="inquiries-section">
-    <h2 className="mb-4">User Inquiries</h2>
-    {inquiries.length === 0 ? (
-      <p className="text-muted">No inquiries yet.</p>
-    ) : (
-      inquiries.map((inq) => (
-        <div key={inq._id} className="card card-dark p-3 mb-2">
-          <div className="d-flex justify-content-between align-items-start">
-            {/* Left: Inquiry details */}
-            <div>
-              <strong>{inq.name}</strong>{" "}
-              <span className="text-muted small">({inq.email})</span>
-              <p className="mb-1 small text-muted">
-                {new Date(inq.createdAt).toLocaleString()}
-              </p>
-              {inq.subject && <p className="mb-1"><strong>{inq.subject}</strong></p>}
-              <p className="mb-0">{inq.message}</p>
-            </div>
-
-            {/* Right: Actions */}
-            <div className="d-flex flex-column gap-2">
-              <a
-                className="btn btn-sm btn-primary"
-                href={`mailto:${inq.email}`}
-              >
-                📧 Reply
-              </a>
-              <button
-                className="btn btn-sm btn-danger"
-                onClick={() => handleDeleteInquiry(inq._id)}
-              >
-                🗑️ Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      ))
-    )}
-  </section>
-)}
+{inquiries.map((inq) => (
+  <div key={inq._id} className="card card-dark p-3 mb-2">
+    <div className="d-flex justify-content-between">
+      <div>
+        <strong>{inq.name}</strong> • <span>{inq.email}</span>
+        <p className="mb-1 small text-muted">{inq.phone} | {inq.company} | {inq.country}</p>
+        <p className="mb-1"><strong>{inq.jobTitle}</strong></p>
+        <p className="mb-1">{inq.jobDetails}</p>
+        <p className="mb-1">{inq.message}</p>
+      </div>
+      <div className="d-flex flex-column">
+        <a href={`mailto:${inq.email}`} className="btn btn-sm btn-primary mb-2">Reply</a>
+        <button
+          className="btn btn-sm btn-danger"
+          onClick={() => handleDeleteInquiry(inq._id)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+))}
 
 
        {/* SERVICES MANAGEMENT */}
