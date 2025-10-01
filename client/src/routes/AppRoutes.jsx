@@ -11,6 +11,7 @@ import Contact from "../pages/Contact";
 import AdminPanel from "../pages/AdminPanel";
 import BlogList from "../pages/BlogList";
 import BlogDetail from "../pages/BlogDetail";
+import EventDetail from "../pages/EventDetail";
 
 
 
@@ -26,7 +27,7 @@ export default function AppRoutes() {
     <Routes>
       {/* Admin standalone route */}
       <Route
-        path="/admin/*"
+        path="/admin"
         element={
           user && user.role === "admin" ? (
             <AdminPanel/>
@@ -46,6 +47,8 @@ export default function AppRoutes() {
         <Route path="services" element={<Services />} />
         
         <Route path="events" element={<Events />} />
+        <Route path="events/:id" element={<EventDetail />} />
+
         <Route path="contact" element={<Contact />} />
        
        

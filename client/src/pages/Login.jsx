@@ -19,7 +19,7 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(res.data.user));
       // alert(`Successfully logged in as ${res.data.user.role}`); 
       if(res.data.user.role === "admin") {
-        
+
         navigate("/admin");
         return;
       }
@@ -39,6 +39,7 @@ function Login() {
           <div className="text-center mb-4">
            
             <img src={logo} alt="Logo" style={{ width: "150px" }} />
+            
             
             
           </div>

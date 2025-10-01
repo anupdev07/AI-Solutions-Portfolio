@@ -9,6 +9,7 @@ import {
   FaSignOutAlt,
   FaTrash,
   FaEdit,
+  FaCalendar,
 } from "react-icons/fa";
 import "../styles/AdminPanel.css";
 
@@ -39,6 +40,19 @@ const [serviceDesc, setServiceDesc] = useState("");
 const [serviceCategory, setServiceCategory] = useState("");
 const [serviceIcon, setServiceIcon] = useState(null);
 
+// Events
+const [events, setEvents] = useState([]);
+const [evTitle, setEvTitle] = useState("");
+const [evDescription, setEvDescription] = useState("");
+const [evDetails, setEvDetails] = useState("");
+const [evDate, setEvDate] = useState("");
+const [evVenue, setEvVenue] = useState("");
+const [evCategory, setEvCategory] = useState("");
+const [evCover, setEvCover] = useState(null);
+const [evImages, setEvImages] = useState([]);
+const [eventMsg, setEventMsg] = useState("");
+
+
   const token = localStorage.getItem("token");
 
   // Guard: redirect non-admins (double-check)
@@ -58,6 +72,7 @@ const [serviceIcon, setServiceIcon] = useState(null);
     fetchBlogs();
     fetchInquiries();
     fetchServices();
+    fetchEvents();
     // eslint-disable-next-line
   }, []);
 
@@ -78,6 +93,15 @@ const [serviceIcon, setServiceIcon] = useState(null);
       console.error("fetchInquiries:", err);
     }
   }
+  
+  async function fetchEvents() {
+  try {
+    const res = await axios.get(`${API_URL}/api/events`);
+    setEvents(res.data || []);
+  } catch (err) {
+    console.error("fetchEvents:", err);
+  }
+}
 
   function handleFileChange(e) {
     const file = e.target.files[0];
@@ -181,6 +205,102 @@ async function fetchServices() {
   }
 }
 
+  function handleCoverChange(e) {
+  setEvCover(e.target.files[0] || null);
+}
+
+function handleImagesChange(e) {
+  setEvImages([...e.target.files]);
+}
+
+async function submitEvent(e) {
+  e.preventDefault();
+  setEventMsg("Saving...");
+  try {
+    const formData = new FormData();
+    formData.append("title", evTitle);
+    formData.append("description", evDescription);
+    formData.append("details", evDetails);
+    formData.append("date", evDate);
+    formData.append("venue", evVenue);
+    formData.append("category", evCategory);
+    if (evCover) formData.append("coverImage", evCover);
+    evImages.forEach((file) => formData.append("images", file));
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    await axios.post(`${API_URL}/api/events`, formData, config);
+    setEventMsg("Event created successfully");
+    resetEventForm();
+    fetchEvents();
+  } catch (err) {
+    console.error("submitEvent:", err);
+    setEventMsg(err.response?.data?.msg || "Failed to save event");
+  }
+}
+
+function resetEventForm() {
+  setEvTitle("");
+  setEvDescription("");
+  setEvDetails("");
+  setEvDate("");
+  setEvVenue("");
+  setEvCategory("");
+  setEvCover(null);
+  setEvImages([]);
+  setEventMsg("");
+}
+
+async function handleDeleteEvent(id) {
+  if (!window.confirm("Delete this event?")) return;
+  try {
+    await axios.delete(`${API_URL}/api/events/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchEvents();
+  } catch (err) {
+    console.error("deleteEvent:", err);
+  }
+}
+
+async function handleAddImages(id, files) {
+  if (!files.length) return;
+  try {
+    const formData = new FormData();
+    for (let f of files) {
+      formData.append("images", f);
+    }
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+    await axios.put(`${API_URL}/api/events/${id}/images`, formData, config);
+    fetchEvents();
+  } catch (err) {
+    console.error("addImages:", err);
+  }
+}
+
+async function handleDeleteImage(id, imgName) {
+  if (!window.confirm("Delete this image?")) return;
+  try {
+    await axios.delete(`${API_URL}/api/events/${id}/image/${imgName}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchEvents();
+  } catch (err) {
+    console.error("deleteImage:", err);
+  }
+}
+
+
   function handleCancelEdit() {
     resetForm();
   }
@@ -218,6 +338,10 @@ async function fetchServices() {
           <li className={activeTab === "services" ? "active" : ""} onClick={() => setActiveTab("services")}>
             <FaCogs className="me-2" /> Services
           </li>
+          <li className={activeTab === "events" ? "active" : ""} onClick={() => setActiveTab("events")}>
+            <FaCalendar className="me-2" /> Events
+          </li>
+
           <li className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>
             <FaUserShield className="me-2" /> Users
           </li>
@@ -346,33 +470,41 @@ async function fetchServices() {
                 ))
               )}
             </div>
-          </section>
-        )}
+            </section>
+                 )}
 
-       {/* INQUIRIES */}
-{inquiries.map((inq) => (
-  <div key={inq._id} className="card card-dark p-3 mb-2">
-    <div className="d-flex justify-content-between">
-      <div>
-        <strong>{inq.name}</strong> • <span>{inq.email}</span>
-        <p className="mb-1 small text-muted">{inq.phone} | {inq.company} | {inq.country}</p>
-        <p className="mb-1"><strong>{inq.jobTitle}</strong></p>
-        <p className="mb-1">{inq.jobDetails}</p>
-        <p className="mb-1">{inq.message}</p>
-      </div>
-      <div className="d-flex flex-column">
-        <a href={`mailto:${inq.email}`} className="btn btn-sm btn-primary mb-2">Reply</a>
-        <button
-          className="btn btn-sm btn-danger"
-          onClick={() => handleDeleteInquiry(inq._id)}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-))}
-
+               {/* INQUIRIES */}
+               {activeTab === "inquiries" && (
+                 <div className="mb-5">
+                   <h5 className="mb-3">All Inquiries</h5>
+                   {inquiries.length === 0 ? (
+                     <p className="text-muted">No inquiries yet.</p>
+                   ) : (
+                     inquiries.map((inq) => (
+                       <div key={inq._id} className="card card-dark p-3 mb-2">
+                         <div className="d-flex justify-content-between">
+                           <div>
+                             <strong>{inq.name}</strong> • <span>{inq.email}</span>
+                             <p className="mb-1 small text-muted">{inq.phone} | {inq.company} | {inq.country}</p>
+                             <p className="mb-1"><strong>{inq.jobTitle}</strong></p>
+                             <p className="mb-1">{inq.jobDetails}</p>
+                             <p className="mb-1">{inq.message}</p>
+                           </div>
+                           <div className="d-flex flex-column">
+                             <a href={`mailto:${inq.email}`} className="btn btn-sm btn-primary mb-2">Reply</a>
+                             <button
+                               className="btn btn-sm btn-danger"
+                               onClick={() => handleDeleteInquiry(inq._id)}
+                             >
+                               Delete
+                             </button>
+                           </div>
+                         </div>
+                       </div>
+                     ))
+                   )}
+                 </div>
+               )}
 
        {/* SERVICES MANAGEMENT */}
 {activeTab === "services" && (
@@ -506,6 +638,138 @@ async function fetchServices() {
         ))
       )}
     </div>
+  </section>
+)}
+
+{/* EVENTS MANAGEMENT */}
+{activeTab === "events" && (
+  <section id="events-section">
+    <h2 className="mb-3">Event Management</h2>
+
+    {/* Create Form */}
+    <form className="card card-dark p-3 mb-4" onSubmit={submitEvent}>
+      <input
+        className="form-control mb-2"
+        placeholder="Title"
+        value={evTitle}
+        onChange={(e) => setEvTitle(e.target.value)}
+        required
+      />
+      <textarea
+        className="form-control mb-2"
+        placeholder="Short Description"
+        value={evDescription}
+        onChange={(e) => setEvDescription(e.target.value)}
+        required
+      />
+      <textarea
+        className="form-control mb-2"
+        placeholder="Detailed Info"
+        value={evDetails}
+        onChange={(e) => setEvDetails(e.target.value)}
+      />
+      <input
+        className="form-control mb-2"
+        type="date"
+        value={evDate}
+        onChange={(e) => setEvDate(e.target.value)}
+        required
+      />
+      <input
+        className="form-control mb-2"
+        placeholder="Venue"
+        value={evVenue}
+        onChange={(e) => setEvVenue(e.target.value)}
+      />
+      <input
+        className="form-control mb-2"
+        placeholder="Category (e.g., Hackathon2025)"
+        value={evCategory}
+        onChange={(e) => setEvCategory(e.target.value)}
+      />
+      <label className="form-label">Cover Image</label>
+      <input
+        type="file"
+        className="form-control mb-2"
+        onChange={handleCoverChange}
+      />
+      <label className="form-label">Gallery Images</label>
+      <input
+        type="file"
+        multiple
+        className="form-control mb-2"
+        onChange={handleImagesChange}
+      />
+      <button type="submit" className="btn btn-primary">
+        Create Event
+      </button>
+      <span className="ms-3 text-muted">{eventMsg}</span>
+    </form>
+
+    {/* Event List */}
+    <h5>All Events</h5>
+    {events.length === 0 ? (
+      <p className="text-muted">No events yet.</p>
+    ) : (
+      events.map((ev) => (
+        <div key={ev._id} className="card card-dark p-3 mb-3 border-dark">
+          <div className="d-flex justify-content-between">
+            <div>
+              <h4>{ev.title}</h4>
+              {ev.coverImage && (
+                <img
+                  src={`${API_URL}/uploads/events/${ev.coverImage}`}
+                  alt="cover"
+                  style={{ width: "150px", height: "100px", objectFit: "cover" }}
+                  className="me-3"
+                />
+              )}
+              
+              <p className="small text-muted">
+                {new Date(ev.date).toLocaleDateString()} @ {ev.venue}
+              </p>
+              <p>{ev.description}</p>
+            </div>
+            <div>
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={() => handleDeleteEvent(ev._id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <hr />
+          {/* Manage Images */}
+          <div className="mt-2">
+            <h6>Manage Images</h6>
+            <div className="d-flex flex-wrap gap-2">
+              {ev.images?.map((img) => (
+                <div key={img} className="position-relative">
+                  <img
+                    src={`${API_URL}/uploads/events/${img}`}
+                    alt="gallery"
+                    style={{ width: "100px", height: "80px", objectFit: "cover" }}
+                  />
+                  <button
+                    className="btn btn-sm btn-danger position-absolute top-0 end-0 "
+                    onClick={() => handleDeleteImage(ev._id, img)}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <input
+              type="file"
+              multiple
+              className="form-control mt-2"
+              onChange={(e) => handleAddImages(ev._id, [...e.target.files])}
+            />
+          </div>
+        </div>
+      ))
+    )}
   </section>
 )}
 
