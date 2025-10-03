@@ -12,6 +12,12 @@ import AdminPanel from "../pages/AdminPanel";
 import BlogList from "../pages/BlogList";
 import BlogDetail from "../pages/BlogDetail";
 import EventDetail from "../pages/EventDetail";
+import Gallery from "../pages/Gallery";
+import Projects from "../pages/Projects";
+
+
+
+
 
 
 
@@ -25,19 +31,7 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      {/* Admin standalone route */}
-      <Route
-        path="/admin"
-        element={
-          user && user.role === "admin" ? (
-            <AdminPanel/>
-          ) : (
-            // logout user and navigate to login
-            localStorage.removeItem("token") || localStorage.removeItem("user") ||
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+      <Route path="admin/*" element={user && user.role === "admin" ? <AdminPanel /> : <Navigate to="/login" replace />} />
 
       {/* Public site routes (with App layout + navbar) */}
       <Route path="/*" element={<App />}>
@@ -48,9 +42,9 @@ export default function AppRoutes() {
         
         <Route path="events" element={<Events />} />
         <Route path="events/:id" element={<EventDetail />} />
-
+        <Route path="gallery" element={<Gallery />} />  
         <Route path="contact" element={<Contact />} />
-       
+        <Route path="projects" element={<Projects />} />
        
         <Route path="*" element={<Navigate to="/" replace />} />
          <Route path="blog" element={<BlogList />} />

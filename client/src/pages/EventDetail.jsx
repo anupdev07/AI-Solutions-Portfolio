@@ -46,11 +46,13 @@ export default function EventDetail() {
         {event.images && event.images.length > 0 ? (
           event.images.map((img, i) => (
             <div key={i} className="col-md-3 mb-3">
-              <img
-                src={`${API_URL}/uploads/events/${img}`}
-                alt="gallery"
-                className="img-fluid rounded shadow"
-              />
+              <a href={`/gallery`} >
+                <img
+                  src={`${API_URL}/uploads/events/${img}`}
+                  alt="gallery"
+                  className="img-fluid rounded shadow"
+                />
+              </a>
             </div>
           ))
         ) : (

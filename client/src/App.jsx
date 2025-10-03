@@ -46,9 +46,22 @@ function App() {
               <li className="nav-item">
                 <Link className="nav-link" to="/events">Events</Link>
               </li>
+              
+              <li className="nav-item">
+                <Link className="nav-link" to="/gallery">Gallery</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/projects">Projects</Link>
+              </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/contact">Contact</Link>
               </li>
+              {user && user.role === "admin" && (
+                <li className="nav-item">
+                  <Link className="nav-link" to="/admin" >Admin</Link>
+                </li>
+              )}
+              
             </ul>
           </div>
 
@@ -99,6 +112,9 @@ function App() {
             <li className="nav-item">
               <Link className="nav-link px-2 text-light" to="/contact">Contact</Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link px-2 text-light" to="/gallery">Gallery</Link>
+            </li>
           </ul>
 
           {/* Right - Social icons */}
@@ -113,6 +129,7 @@ function App() {
               <i className="bi bi-linkedin"></i>
             </a>
           </div>
+          
         </div>
       </footer>
     </>

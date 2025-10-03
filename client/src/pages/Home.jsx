@@ -4,16 +4,30 @@
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/Services.css";
+import { FaDotCircle, FaIndustry, FaRegAddressBook, FaRegAddressCard } from "react-icons/fa";
 
 export default function Home() {
   const API_URL = "http://localhost:5000";
 
   const [blogs, setBlogs] = useState([]);
   const [services, setServices] = useState([]);
+  const [events, setEvents] = useState([]);
+  const today = new Date();
+  const upcoming = events.filter((e) => new Date(e.date) >= today);
+  const [projects, setProjects] = useState([]);
+useEffect(() => {
+  axios.get(`${API_URL}/api/projects`).then((res) => {
+    setProjects(res.data);
+  });
+}, []);
 
+  function formatDate(date) {
+    return new Date(date).toLocaleDateString();
+  }
   useEffect(() => {
     fetchBlogs();
     fetchServices();
+    fetchEvents();
   }, []);
 
   async function fetchBlogs() {
@@ -31,6 +45,15 @@ export default function Home() {
       setServices(res.data.slice(0, 3)); // only 3 previews
     } catch (err) {
       console.error("Error fetching services:", err);
+    }
+  }
+
+  async function fetchEvents() {
+    try {
+      const res = await axios.get(`${API_URL}/api/events`);
+      setEvents(res.data.slice(0, 3)); // only 3 previews
+    } catch (err) {
+      console.error("Error fetching events:", err);
     }
   }
 
@@ -70,26 +93,44 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom Section: Scrolling Logos */}
+      {/* Bottom Section: Scrolling Logos. Feature Logo Uploaded companys from projects table */}
       <div className="logos-container mt-5">
         
         <div className="logos-slide">
-          <img src="/src/assets/company1.png" alt="Company 1" />
+        {/* <img src="/src/assets/company1.png" alt="Company 1" />
           <img src="/src/assets/company2.png" alt="Company 2" />
           <img src="/src/assets/company3.png" alt="Company 3" />
           <img src="/src/assets/company4.png" alt="Company 4" />
           <img src="/src/assets/company5.png" alt="Company 5" />
-          <img src="/src/assets/company6.png" alt="Company 5" />
+          <img src="/src/assets/company6.png" alt="Company 5" /> */}
+          {projects
+            .filter((p) => p.logo)
+            .map((p) => (
+              <img
+                key={p._id}
+                src={`${API_URL}/uploads/projects/${p.logo}`}
+                alt={p.title}
+              />
+            ))}
         </div>
         
-        {/* Duplicate for infinite loop */}
+        {/* Fetched from company's logo from project table */}
         <div className="logos-slide">
-          <img src="/src/assets/company1.png" alt="Company 1" />
+          {/* <img src="/src/assets/company1.png" alt="Company 1" />
           <img src="/src/assets/company2.png" alt="Company 2" />
           <img src="/src/assets/company3.png" alt="Company 3" />
           <img src="/src/assets/company4.png" alt="Company 4" />
           <img src="/src/assets/company5.png" alt="Company 5" />
-          <img src="/src/assets/company6.png" alt="Company 5" /> 
+          <img src="/src/assets/company6.png" alt="Company 5" /> */}
+          {projects
+            .filter((p) => p.logo)
+            .map((p) => (
+              <img
+                key={p._id}
+                src={`${API_URL}/uploads/projects/${p.logo}`}
+                alt={p.title}
+              />
+            ))}
         </div>
       </div>
 <br></br>
@@ -128,6 +169,71 @@ export default function Home() {
           </Link>
         </div>
       </section>
+{/* Featured Projects Preview */}
+<div className="container py-5">
+  <h2 className="mb-4 text-center">Our Projects</h2>
+  <div className="row">
+    {projects.filter((p) => p.featured).length === 0 ? (
+      <p className="text-muted text-center">No featured projects yet.</p>
+    ) : (
+      projects
+        .filter((p) => p.featured)
+        .slice(0, 3)
+        .map((p) => (
+          <div key={p._id} className="col-md-4 mb-4">
+            <div className="card h-100 shadow-lg bg-dark text-light border-0 rounded-3 overflow-hidden position-relative project-card">
+              {/* Cover Image */}
+              {p.coverImage && (
+                <img
+                  src={`${API_URL}/uploads/projects/${p.coverImage}`}
+                  alt={p.title}
+                  className="card-img-top"
+                  style={{ height: "200px", objectFit: "cover" }}
+                />
+              )}
+
+              {/* Logo overlay with black shadow */}
+              {p.logo && (
+                <img
+                  src={`${API_URL}/uploads/projects/${p.logo}`}
+                  alt="logo"
+                  className="rounded-circle border border-3 border-white position-absolute"
+                  style={{
+                    width: "70px",
+                    height: "70px",
+                    top: "150px",
+                    left: "20px",
+                    objectFit: "contain",
+                    backgroundColor: "#fff",
+                  }}
+                />
+              )}
+
+              <div className="card-body mt-4">
+                <h5 className="card-title">{p.title}</h5>
+                <p className="text small mb-2 italic"><FaRegAddressBook/> {p.clientName}</p>
+                <p className="card-text">{p.summary}</p>
+                {/* add https:// in links if not present */}
+                <a
+                  href={p.link.startsWith("https://") ? p.link : `https://${p.link}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline-light btn-sm mt-2"
+                >
+                  View Project
+                </a>
+              </div>
+            </div>
+          </div>
+        ))
+    )}
+  </div>
+  <div className="text-center mt-4">
+    <a href="/projects" className="btn btn-outline-light">
+      See More Projects
+    </a>
+  </div>
+</div>
 
       {/* Blog Preview */}
       <section className="py-5">
@@ -173,32 +279,43 @@ export default function Home() {
       {/* Events Section */}
       <section className="py-5">
         <h2 className="mb-4 text-center">Upcoming Events</h2>
+        {/* only upcoming events fetched from database and check date for confirming it is upcoming */}
         <div className="row">
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <h5>Event 1</h5>
-                <p>Placeholder event details go here...</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <h5>Event 2</h5>
-                <p>Placeholder event details go here...</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <h5>Event 3</h5>
-                <p>Placeholder event details go here...</p>
-              </div>
-            </div>
-          </div>
-        </div>
+                  {upcoming.length === 0 ? (
+                    <p>No upcoming events.</p>
+                  ) : (
+                    upcoming.map((event) => (
+                      <div key={event._id} className="col-md-4 mb-4">
+                        <div className="card upcoming-card h-100">
+                          {event.coverImage && (
+                            <img
+                              src={`${API_URL}/uploads/events/${event.coverImage}`}
+                              alt={event.title}
+                              className="card-img-top"
+                              style={{ height: "200px", objectFit: "cover" }}
+                            />
+                          )}
+                          <div className="card-body text-light">
+                            <h5 className="card-title">{event.title}</h5>
+                            <p className="card-text">
+                              📅 {formatDate(event.date)} <br />
+                              📍 {event.venue}
+                            </p>
+                            <p className="small text">"{event.description}"</p>
+                            <Link
+                              to={`/events/${event._id}`}
+                              className="btn btn-outline-light"
+                            >
+                              More Details
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+
         <div className="text-center mt-3">
           <Link to="/events" className="btn btn-outline-light">
             See More
@@ -237,6 +354,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      Gallery Section
+      
     </div>
   );
 }
