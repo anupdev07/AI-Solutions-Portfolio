@@ -14,9 +14,7 @@ import BlogDetail from "../pages/BlogDetail";
 import EventDetail from "../pages/EventDetail";
 import Gallery from "../pages/Gallery";
 import Projects from "../pages/Projects";
-
-
-
+import Reviews from "../pages/Reviews";
 
 
 
@@ -45,6 +43,7 @@ export default function AppRoutes() {
         <Route path="gallery" element={<Gallery />} />  
         <Route path="contact" element={<Contact />} />
         <Route path="projects" element={<Projects />} />
+        <Route path="reviews" element={<Reviews />} />
        
         <Route path="*" element={<Navigate to="/" replace />} />
          <Route path="blog" element={<BlogList />} />

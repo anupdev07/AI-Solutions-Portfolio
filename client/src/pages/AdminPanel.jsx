@@ -12,6 +12,8 @@ import {
   FaCalendar,
   FaUserLock,
   FaRProject,
+  FaCheckCircle, 
+  FaTimesCircle
 } from "react-icons/fa";
 import "../styles/AdminPanel.css";
 
@@ -64,6 +66,10 @@ export default function AdminPanel() {
   const [pLink, setPLink] = useState("");
   const [pFeatured, setPFeatured] = useState(false);
   const [logoFile, setLogoFile] = useState(null);
+
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+
   // const [coverFile, setCoverFile] = useState(null);
   const [pMsg, setPMsg] = useState("");
 
@@ -88,6 +94,7 @@ export default function AdminPanel() {
     fetchServices();
     fetchEvents();
     fetchProjects();
+    fetchReviews();
     // eslint-disable-next-line
   }, []);
 
@@ -115,6 +122,17 @@ export default function AdminPanel() {
       setEvents(res.data || []);
     } catch (err) {
       console.error("fetchEvents:", err);
+    }
+  }
+
+  async function fetchReviews() {
+    try {
+      const res = await axios.get(`${API_URL}/api/reviews/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setReviews(res.data || []);
+    } catch (err) {
+      console.error("fetchReviews:", err);
     }
   }
 
@@ -221,6 +239,8 @@ export default function AdminPanel() {
       console.error("fetchServices:", err);
     }
   }
+
+
 
   function handleCoverChange(e) {
     setEvCover(e.target.files[0] || null);
@@ -386,6 +406,33 @@ export default function AdminPanel() {
     }
   }
 
+    async function handleDeleteReview(id) {
+    if (!window.confirm("Delete this review?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/api/reviews/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchReviews();
+    } catch (err) {
+      console.error("deleteReview:", err);
+    }
+  }
+
+  async function handleToggleReviewStatus(id, status) {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${API_URL}/api/reviews/${id}/status`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchReviews();
+    } catch (err) {
+      console.error("toggleReviewStatus:", err);
+    }
+  }
+
+
+
   async function handleToggleFeatured(id, featured) {
     try {
       await axios.patch(`${API_URL}/api/projects/${id}/feature`, { featured }, {
@@ -450,6 +497,12 @@ export default function AdminPanel() {
             onClick={() => setActiveTab("projects")}
           >
             <FaCogs className="me-2" /> Projects
+          </li>
+          <li
+            className={`nav-item ${activeTab === "reviews" ? "active" : ""}`}
+            onClick={() => setActiveTab("reviews")}
+          >
+            <i className="bi bi-star me-2"></i> Manage Reviews
           </li>
 
           <li
@@ -1120,6 +1173,80 @@ export default function AdminPanel() {
             </div>
           </section>
         )}
+
+        {/* REVIEWS MANAGEMENT */}
+{activeTab === "reviews" && (
+  <div className="p-4 bg-dark text-light rounded shadow">
+    <h2 className="mb-4">Manage Reviews</h2>
+    {reviews.length === 0 ? (
+      <p>No reviews yet.</p>
+    ) : (
+      <div className="table-responsive">
+        <table className="table table-dark table-striped align-middle">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Rating</th>
+              <th>Satisfaction</th>
+              <th>Recommend</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reviews.map((r) => (
+              <tr key={r._id}>
+                <td>{r.user?.username || "Unknown"}</td>
+                <td>{"⭐".repeat(r.rating)}</td>
+                <td>{r.satisfactionScore || "-"}/10</td>
+                <td>{r.recommend ? "✅ Yes" : "❌ No"}</td>
+                <td padding="3" width="400">{r.message}</td>
+                <td padding="3">
+                  <span
+                    className={`badge ${
+                      r.status === "approved"
+                        ? "bg-success"
+                        : r.status === "denied"
+                        ? "bg-danger"
+                        : "bg-secondary"
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                </td>
+                <td>
+                  {r.status !== "approved" && (
+                    <button
+                      className="btn btn-sm btn-success me-2"
+                      onClick={() => handleToggleReviewStatus(r._id, "approved")}
+                    >
+                      <FaCheckCircle />
+                    </button>
+                  )}
+                  {r.status !== "denied" && (
+                    <button
+                      className="btn btn-sm btn-warning me-2"
+                      onClick={() => handleToggleReviewStatus(r._id, "denied")}
+                    >
+                      <FaTimesCircle />
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => deleteReview(r._id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+)}
 
         {/* Users (placeholder) */}
         {activeTab === "users" && (

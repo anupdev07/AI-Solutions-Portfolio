@@ -56,6 +56,9 @@ function App() {
               <li className="nav-item">
                 <Link className="nav-link" to="/contact">Contact</Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/reviews">Reviews</Link>
+              </li>
               {user && user.role === "admin" && (
                 <li className="nav-item">
                   <Link className="nav-link" to="/admin" >Admin</Link>
@@ -114,6 +117,12 @@ function App() {
             </li>
             <li className="nav-item">
               <Link className="nav-link px-2 text-light" to="/gallery">Gallery</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link px-2 text-light" to="/projects">Projects</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link px-2 text-light" to="/reviews">Reviews</Link>
             </li>
           </ul>
 

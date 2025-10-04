@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { FaLinkedin, FaFacebook, FaTwitter } from "react-icons/fa";
+import { FaLinkedin, FaFacebook, FaTwitter, FaUser } from "react-icons/fa";
 export default function Contact() {
   const API_URL = "http://localhost:5000";
   const [formData, setFormData] = useState({
@@ -56,7 +56,7 @@ export default function Contact() {
             </div>
           </div>
           <div className="col-lg-5 text-center">
-            <img src="/src/assets/logo.png" alt="Contact" className="img-fluid rounded shadow-lg" style={{maxHeight: 220, objectFit: "cover"}} />
+            <img src="/src/assets/logo.png" alt="Contact" className="img-fluid rounded shadow-lg" style={{maxHeight: 150, objectFit: "cover"}} />
           </div>
         </div>
 

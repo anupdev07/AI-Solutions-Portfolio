@@ -58,6 +58,7 @@ exports.login = async (req, res) => {
 };
 
 
+
 // Logout (client handles token removal)
 exports.logout = async (req, res) => {
   res.json({ message: "Logout successful" });

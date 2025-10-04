@@ -12,9 +12,7 @@ const indexRoutes = require("./routes/index.js");
 const serviceRoutes = require("./routes/services.js");
 const eventRoutes = require("./routes/events");
 const projectRoutes = require("./routes/projects");
-
-
-
+const reviewRoutes = require("./routes/reviews");
 
 
 const app = express();
@@ -36,6 +34,7 @@ app.use("/api", indexRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/reviews", reviewRoutes);
 // Start server
 const PORT = process.env.PORT || 5000;
 

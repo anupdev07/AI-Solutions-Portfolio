@@ -1,10 +1,8 @@
-
-
- import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/Services.css";
-import { FaDotCircle, FaIndustry, FaRegAddressBook, FaRegAddressCard } from "react-icons/fa";
+import { FaDotCircle, FaIndustry, FaRegAddressBook, FaRegAddressCard, FaUser, FaUserCircle } from "react-icons/fa";
 
 export default function Home() {
   const API_URL = "http://localhost:5000";
@@ -28,6 +26,7 @@ useEffect(() => {
     fetchBlogs();
     fetchServices();
     fetchEvents();
+    fetchReviews();
   }, []);
 
   async function fetchBlogs() {
@@ -56,6 +55,23 @@ useEffect(() => {
       console.error("Error fetching events:", err);
     }
   }
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+  async function fetchReviews() {
+    try {
+      const res = await axios.get(`${API_URL}/api/reviews`);
+  setReviews(res.data.filter((r) => r.status === "approved")); // only approved reviews
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+    }
+  }
+
+  const topReviews = reviews
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3); // Top 3 reviews by rating
 
   return (
     <div className="container py-5">
@@ -323,38 +339,70 @@ useEffect(() => {
         </div>
       </section>
 
-      
       {/* Testimonials */}
-      <section className="py-5 text-center">
-        <h2 className="mb-4">Client Testimonials</h2>
-        <div className="row">
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <p>"Amazing service and excellent support!"</p>
-                <small>- Client 1</small>
+      <div className="py-5">
+        <h2 className="mb-4 text-center">What Our Clients Say</h2>
+        <div className="row justify-content-center">
+          {topReviews.length === 0 ? (
+            <p className="text-center text-muted">No reviews available yet.</p>
+          ) : (
+            topReviews.map((r) => (
+              <div key={r._id} className="col-md-4 mb-4 d-flex">
+                <div
+                  className="card bg-dark text-light border-0 shadow-lg rounded-4 flex-fill h-100 position-relative review-card"
+                  style={{
+                    borderTop: r.recommend ? "4px solid #28a745" : "4px solid #dc3545",
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                  }}
+                >
+                  <div className="card-body d-flex flex-column align-items-center">
+                    <FaUserCircle size={54} className="mb-2 text-secondary" />
+                    <span className="fw-bold text-uppercase mb-1" style={{ letterSpacing: 1 }}>
+                      {r.user?.username || "Anonymous"}
+                    </span>
+                    <div style={{ color: "#FFD700", fontSize: "1.5rem", marginBottom: "0.5rem" }}>
+                      {"★".repeat(r.rating)}
+                    </div>
+                    <p className="card-text flex-grow-1 fst-italic mb-2" style={{ color: "#ffb366" }}>
+                      "{r.message}"
+                    </p>
+                    <div className="d-flex justify-content-center align-items-center gap-2 mb-2">
+                      <span
+                        className="badge rounded-pill"
+                        style={{
+                          background: r.satisfactionScore >= 8
+                            ? "#28a745"
+                            : r.satisfactionScore >= 5
+                            ? "#ffc107"
+                            : "#dc3545",
+                          color: "#fff",
+                          fontWeight: 500,
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        Satisfaction: {r.satisfactionScore}/10
+                      </span>
+                      <span className={`badge rounded-pill ${r.recommend ? "bg-success" : "bg-danger"}`}>
+                        {r.recommend ? "Recommended" : "Not Recommended"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <p>"AI-Solutions helped us transform our workflow."</p>
-                <small>- Client 2</small>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-4 mb-3">
-            <div className="card bg-dark text-light h-100">
-              <div className="card-body">
-                <p>"Professional, reliable, and innovative."</p>
-                <small>- Client 3</small>
-              </div>
-            </div>
-          </div>
+            )))}
+          {topReviews.length === 0 && (<p className="text-center">No reviews yet.</p>)}
         </div>
-      </section>
-      Gallery Section
+        <div className="text-center mt-3">
+        </div>
+        <div className="text-center mt-3">
+          <Link to="/reviews" className="btn btn-outline-light">
+            Read All Reviews
+          </Link>
+        </div>
+      </div>
+
+      
+      
       
     </div>
   );
