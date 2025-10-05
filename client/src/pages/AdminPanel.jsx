@@ -83,6 +83,7 @@ export default function AdminPanel() {
   useEffect(() => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      console.log(user);
       if (!user || user.role !== "admin") {
       navigate("/login");
       }
@@ -517,7 +518,7 @@ export default function AdminPanel() {
       {
         label: "Satisfaction Score",
         data: satisfactionDist,
-        backgroundColor: "#ffb366",
+        backgroundColor: "#2dff49ff",
         borderRadius: 6,
         barThickness: 22,
       },
@@ -1429,7 +1430,7 @@ export default function AdminPanel() {
                   )}
                   <button
                     className="btn btn-sm btn-danger"
-                    onClick={() => deleteReview(r._id)}
+                    onClick={() => handleDeleteReview(r._id)}
                   >
                     <FaTrash />
                   </button>
@@ -1443,7 +1444,7 @@ export default function AdminPanel() {
   </div>
 )}
 
-        
+
       </main>
     </div>
   );

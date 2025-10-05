@@ -16,20 +16,17 @@ import Gallery from "../pages/Gallery";
 import Projects from "../pages/Projects";
 import Reviews from "../pages/Reviews";
 
-
-
-
 export default function AppRoutes() {
-  let user = null;
+  /* let user = null;
   try {
     user = JSON.parse(localStorage.getItem("user"));
   } catch (e) {
     user = null;
-  }
+  } */
 
   return (
     <Routes>
-      <Route path="admin/*" element={user && user.role === "admin" ? <AdminPanel /> : <Navigate to="/login" replace />} />
+      <Route path="admin/*" element={<AdminPanel />} />
 
       {/* Public site routes (with App layout + navbar) */}
       <Route path="/*" element={<App />}>
@@ -37,20 +34,18 @@ export default function AppRoutes() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="services" element={<Services />} />
-        
+
         <Route path="events" element={<Events />} />
         <Route path="events/:id" element={<EventDetail />} />
-        <Route path="gallery" element={<Gallery />} />  
+        <Route path="gallery" element={<Gallery />} />
         <Route path="contact" element={<Contact />} />
         <Route path="projects" element={<Projects />} />
         <Route path="reviews" element={<Reviews />} />
-       
+
         <Route path="*" element={<Navigate to="/" replace />} />
-         <Route path="blog" element={<BlogList />} />
-          <Route path="blog/:slug" element={<BlogDetail />} />
+        <Route path="blog" element={<BlogList />} />
+        <Route path="blog/:slug" element={<BlogDetail />} />
       </Route>
-      
-      
     </Routes>
   );
 }
