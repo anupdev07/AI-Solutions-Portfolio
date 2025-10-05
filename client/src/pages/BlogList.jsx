@@ -88,7 +88,6 @@ export default function Blog() {
                     {b.title}
                   </h5>
                   <div className="d-flex align-items-center mb-2">
-                    {/* Author avatar */}
                     <div
                       className="me-2 d-flex align-items-center justify-content-center"
                       style={{
@@ -99,13 +98,13 @@ export default function Blog() {
                         color: "#FFD700",
                         fontWeight: 700,
                         fontSize: "1.1rem",
-                        border: "1.5px solid #ffffffff",
+                        border: "1.5px solid #FFD700",
                       }}
                     >
-                      {getInitial(b.author?.username || "A")}
+                      {(b.author?.username || b.author || "A")[0].toUpperCase()}
                     </div>
                     <span className="small text-white-50">
-                      {b.author?.username || "Admin"} &bull;{" "}
+                      {b.author?.username || b.author || "Admin"} &bull;{" "}
                       {new Date(b.createdAt).toLocaleDateString()}
                     </span>
                   </div>

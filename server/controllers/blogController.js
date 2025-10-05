@@ -4,7 +4,7 @@ const slugify = require("slugify");
 // Create Blog
 exports.createBlog = async (req, res) => {
   try {
-    const { title, content, excerpt, tags } = req.body;
+    const { title, content, excerpt, tags, author } = req.body;
 
     if (!title || !content || !excerpt) {
       return res.status(400).json({ msg: "Title, content, and excerpt are required" });
@@ -15,15 +15,15 @@ exports.createBlog = async (req, res) => {
     const blog = new Blog({
       title,
       slug,
-      content,
       excerpt,
+      content,
       tags: tags ? tags.split(",").map(t => t.trim()) : [],
-      coverImage: req.file ? req.file.filename : null,
-      author: req.user.id
+      author, // <-- use manual author
+      coverImage: req.file ? req.file.filename : undefined,
     });
 
     await blog.save();
-    res.status(201).json(blog);
+    res.json(blog);
   } catch (error) {
     console.error("Error creating blog:", error);
     res.status(500).json({ msg: "Server error" });
@@ -56,7 +56,7 @@ exports.getBlog = async (req, res) => {
 // Update Blog
 exports.updateBlog = async (req, res) => {
   try {
-    const { title, content, excerpt, tags } = req.body;
+    const { title, content, excerpt, tags, author } = req.body;
 
     let slug;
     if (title) slug = slugify(title, { lower: true, strict: true });
@@ -64,9 +64,10 @@ exports.updateBlog = async (req, res) => {
     const updateData = {
       title,
       slug,
-      content,
       excerpt,
-      tags: tags ? tags.split(",").map(t => t.trim()) : []
+      content,
+      tags: tags ? tags.split(",").map(t => t.trim()) : [],
+      author, // <-- use manual author
     };
 
     if (req.file) {

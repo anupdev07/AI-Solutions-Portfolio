@@ -12,10 +12,15 @@ import {
   FaCalendar,
   FaUserLock,
   FaRProject,
-  FaCheckCircle, 
-  FaTimesCircle
+  FaCheckCircle,
+  FaTimesCircle,
+  FaTachometerAlt
 } from "react-icons/fa";
 import "../styles/AdminPanel.css";
+// Import Chart.js and react-chartjs-2
+import { Bar, Pie, Doughnut } from "react-chartjs-2";
+import { Chart, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+Chart.register(ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -23,7 +28,7 @@ export default function AdminPanel() {
   // API base - change if your backend is on another host/port
   const API_URL = "http://localhost:5000";
 
-  const [activeTab, setActiveTab] = useState("blogs");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [blogs, setBlogs] = useState([]);
   const [inquiries, setInquiries] = useState([]);
 
@@ -36,8 +41,7 @@ export default function AdminPanel() {
   const [preview, setPreview] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [statusMsg, setStatusMsg] = useState("");
-
-  // Services state
+  const [author, setAuthor] = useState("");
   const [services, setServices] = useState([]);
   const [serviceTitle, setServiceTitle] = useState("");
   const [serviceDesc, setServiceDesc] = useState("");
@@ -80,11 +84,11 @@ export default function AdminPanel() {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
       if (!user || user.role !== "admin") {
-        navigate("/login");
+      navigate("/login");
       }
     } catch (e) {
-      navigate("/login");
-    }
+          navigate("/login");
+        }
     // eslint-disable-next-line
   }, []);
 
@@ -155,6 +159,7 @@ export default function AdminPanel() {
     setPreview(null);
     setEditingId(null);
     setStatusMsg("");
+    setAuthor("");
   }
 
   async function submitBlog(e) {
@@ -165,8 +170,9 @@ export default function AdminPanel() {
       formData.append("title", title);
       formData.append("excerpt", excerpt);
       formData.append("content", content);
-      formData.append("tags", tags); // backend will split by comma
+      formData.append("tags", tags);
       if (coverFile) formData.append("coverImage", coverFile);
+      formData.append("author", author);
 
       const config = {
         headers: {
@@ -201,6 +207,7 @@ export default function AdminPanel() {
     setPreview(
       blog.coverImage ? `${API_URL}/uploads/blogs/${blog.coverImage}` : null
     );
+    setAuthor(blog.author?.username || blog.author || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
     setActiveTab("blogs");
   }
@@ -239,8 +246,6 @@ export default function AdminPanel() {
       console.error("fetchServices:", err);
     }
   }
-
-
 
   function handleCoverChange(e) {
     setEvCover(e.target.files[0] || null);
@@ -406,7 +411,7 @@ export default function AdminPanel() {
     }
   }
 
-    async function handleDeleteReview(id) {
+  async function handleDeleteReview(id) {
     if (!window.confirm("Delete this review?")) return;
     try {
       const token = localStorage.getItem("token");
@@ -459,6 +464,67 @@ export default function AdminPanel() {
     }
   }
 
+  // --- DASHBOARD DATA ---
+  // Ratings
+  const ratings = reviews.map((r) => r.rating);
+  const avgRating = ratings.length
+    ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)
+    : "N/A";
+  // Satisfaction
+  const satisfaction = reviews.map((r) => r.satisfactionScore || 0);
+  const avgSatisfaction = satisfaction.length
+    ? (satisfaction.reduce((a, b) => a + b, 0) / satisfaction.length).toFixed(2)
+    : "N/A";
+  // Recommend
+  const recommendCount = reviews.filter((r) => r.recommend).length;
+  const notRecommendCount = reviews.length - recommendCount;
+
+  // Chart Data
+  const ratingDist = [1, 2, 3, 4, 5].map(
+    (star) => reviews.filter((r) => r.rating === star).length
+  );
+  const satisfactionDist = Array(10)
+    .fill(0)
+    .map((_, i) => reviews.filter((r) => r.satisfactionScore === i + 1).length);
+
+  const pieData = {
+    labels: ["Recommend", "Not Recommend"],
+    datasets: [
+      {
+        data: [recommendCount, notRecommendCount],
+        backgroundColor: ["#28a745", "#dc3545"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barData = {
+    labels: ["1★", "2★", "3★", "4★", "5★"],
+    datasets: [
+      {
+        label: "User Ratings",
+        data: ratingDist,
+        backgroundColor: "#FFD700",
+        borderRadius: 6,
+        barThickness: 32,
+      },
+    ],
+  };
+
+  const satisfactionBarData = {
+    labels: Array.from({ length: 10 }, (_, i) => `${i + 1}`),
+    datasets: [
+      {
+        label: "Satisfaction Score",
+        data: satisfactionDist,
+        backgroundColor: "#ffb366",
+        borderRadius: 6,
+        barThickness: 22,
+      },
+    ],
+  };
+
+  // --- DASHBOARD SECTION ---
   return (
     <div className="admin-wrapper">
       {/* Sidebar */}
@@ -468,6 +534,12 @@ export default function AdminPanel() {
         </div>
 
         <ul className="admin-nav">
+          <li
+            className={activeTab === "dashboard" ? "active" : ""}
+            onClick={() => setActiveTab("dashboard")}
+          >
+            <FaTachometerAlt className="me-2" /> Dashboard
+          </li>
           <li
             className={activeTab === "blogs" ? "active" : ""}
             onClick={() => setActiveTab("blogs")}
@@ -504,15 +576,7 @@ export default function AdminPanel() {
           >
             <i className="bi bi-star me-2"></i> Manage Reviews
           </li>
-
-          <li
-            className={activeTab === "users" ? "active" : ""}
-            onClick={() => setActiveTab("users")}
-          >
-            <FaUserShield className="me-2" /> Users
-          </li>
         </ul>
-
         <div className="mt-auto">
           <button
             className="btn btn-outline-light w-100"
@@ -525,6 +589,127 @@ export default function AdminPanel() {
 
       {/* Main */}
       <main className="admin-main">
+        {/* DASHBOARD */}
+        {activeTab === "dashboard" && (
+          <section className="py-4">
+            <h2 className="mb-4">Dashboard Overview</h2>
+            <div className="row g-4 mb-4">
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Blogs</h6>
+                  <div className="display-6 fw-bold">{blogs.length}</div>
+                </div>
+              </div>
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Projects</h6>
+                  <div className="display-6 fw-bold">{projects.length}</div>
+                </div>
+              </div>
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Services</h6>
+                  <div className="display-6 fw-bold">{services.length}</div>
+                </div>
+              </div>
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Reviews</h6>
+                  <div className="display-6 fw-bold">{reviews.length}</div>
+                </div>
+              </div>
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Inquiries</h6>
+                  <div className="display-6 fw-bold">{inquiries.length}</div>
+                </div>
+              </div>
+              <div className="col-6 col-md-2">
+                <div className="card card-dark p-3 text-center shadow-sm border-0">
+                  <h6 className="mb-1 text-uppercase small">Events</h6>
+                  <div className="display-6 fw-bold">{events.length}</div>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <div className="row g-4">
+              <div className="col-12 col-lg-6">
+                <div className="card card-dark p-3 h-100 shadow-sm border-0">
+                  <h6 className="mb-3 text-center">User Ratings Distribution</h6>
+                  <div style={{ height: 360 }}>
+                    <Bar
+                      data={barData}
+                      options={{
+                        plugins: { legend: { display: false } },
+                        scales: {
+                          y: { beginAtZero: true, ticks: { stepSize: 1, color: "#bdbdbd" } },
+                          x: { ticks: { color: "#bdbdbd" } }
+                        },
+                        maintainAspectRatio: false,
+                      }}
+                    />
+                  </div>
+                  <div className="mt-3 text-center">
+                    <span className="fw-bold">Average Rating: </span>
+                    <span style={{ color: "#FFD700", fontWeight: 700 }}>{avgRating}</span>
+                  </div>
+                </div>
+              </div>
+              {/* vertical divider for large screens */}
+              
+                
+              
+              <div className="col-12 col-lg-6">
+                <div className="card card-dark p-3 h-100 shadow-sm border-0">
+                  <h6 className="mb-3 text-center">Satisfaction Score Distribution</h6>
+                  <div style={{ height: 360 }}>
+                    <Bar
+                      data={satisfactionBarData}
+                      options={{
+                        plugins: { legend: { display: false } },
+                        scales: {
+                          y: { beginAtZero: true, ticks: { stepSize: 1, color: "#bdbdbd" } },
+                          x: { ticks: { color: "#bdbdbd" } }
+                        },
+                        maintainAspectRatio: false,
+                      }}
+                    />
+                  </div>
+                  <div className="mt-3 text-center">
+                    <span className="fw-bold">Avg. Satisfaction: </span>
+                    <span style={{ color: "#ffb366", fontWeight: 700 }}>{avgSatisfaction}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="col-12 col-lg-12">
+                <div className="card card-dark p-3 h-100 shadow-sm border-0">
+                  <h6 className="mb-3 text-center">Recommendation Ratio</h6>
+                  <div style={{ height: 300, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Doughnut
+                      data={pieData}
+                      options={{
+                        plugins: { legend: { position: "bottom", labels: { color: "#bdbdbd" } } },
+                        cutout: "70%",
+                        maintainAspectRatio: false,
+                      }}
+                    />
+                  </div>
+                  <div className="mt-3 text-center">
+                    <span className="fw-bold" style={{ color: "#28a745" }}>
+                      {recommendCount}
+                    </span>{" "}
+                    recommend,{" "}
+                    <span className="fw-bold" style={{ color: "#dc3545" }}>
+                      {notRecommendCount}
+                    </span>{" "}
+                    do not
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* BLOG MANAGEMENT */}
         {activeTab === "blogs" && (
           <section id="blogs-section">
@@ -601,6 +786,16 @@ export default function AdminPanel() {
                 </div>
               )}
 
+              <div className="mb-2">
+                <input
+                  className="form-control"
+                  placeholder="Author Name"
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  required
+                />
+              </div>
+
               <div className="d-flex gap-2">
                 <button type="submit" className="btn btn-primary">
                   {editingId ? "Update Blog" : "Create Blog"}
@@ -645,7 +840,7 @@ export default function AdminPanel() {
                         <h6 className="mb-1">{b.title}</h6>
                         <p className="mb-1 small text-muted">{b.excerpt}</p>
                         <p className="mb-0 small text-muted">
-                          By {b.author?.username || "admin"} •{" "}
+                          By {b.author?.username || b.author || "admin"} •{" "}
                           {fmtDate(b.createdAt)}
                         </p>
                         <div className="mt-2">
@@ -1012,7 +1207,7 @@ export default function AdminPanel() {
                   </div>
                 </div>
               ))
-            )}
+           ) }
           </section>
         )}
 
@@ -1248,15 +1443,7 @@ export default function AdminPanel() {
   </div>
 )}
 
-        {/* Users (placeholder) */}
-        {activeTab === "users" && (
-          <section id="users-section">
-            <h2>User / Admin Management</h2>
-            <p className="text-muted">
-              Add new admins and manage users here (coming soon).
-            </p>
-          </section>
-        )}
+        
       </main>
     </div>
   );

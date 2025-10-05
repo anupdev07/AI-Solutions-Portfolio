@@ -6,7 +6,7 @@ const BlogSchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, lowercase: true },
     content: { type: String, required: true },
     excerpt: { type: String, required: true },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    author: { type: String, required: true }, // <-- allow string
     tags: [{ type: String }],
     coverImage: { type: String }
   },

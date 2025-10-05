@@ -2,7 +2,9 @@ import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import logo from "./assets/logo.png";
 import Chatbot from "./components/ChatBot";  
-
+import { FaFacebookF, FaTwitter, FaLinkedinIn, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
+import axios from "axios";
+// import "./styles/global.css";
 function App() {
   const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ function App() {
       <nav className="navbar navbar-expand-lg navbar-custom fixed-top">
         <div className="container-fluid d-flex justify-content-between align-items-center">
           {/* Left: Logo */}
-          <Link className="navbar-brand d-flex align-items-center" to="/">
+          <Link className="navbar-brand d-flex align-items-center" to="/home">
             <img src={logo} alt="Logo" style={{ height: "40px" }} />
           </Link>
 
@@ -94,54 +96,66 @@ function App() {
       </div>
 
       {/* Footer */}
-      <footer className="footer bg-dark text-light py-4 mt-5">
-        <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-          {/* Left - Logo + Name */}
-          <div className="d-flex align-items-center mb-3 mb-md-0">
-            <img src={logo} alt="Logo" style={{ height: "30px", marginRight: "10px" }} />
-            <span>© {new Date().getFullYear()} AI Solutions. All rights reserved.</span>
-          </div>
-
-          {/* Center - Nav links */}
-          <ul className="nav mb-3 mb-md-0">
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/services">Services</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/blog">Blog</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/events">Events</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/contact">Contact</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/gallery">Gallery</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/projects">Projects</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link px-2 text-light" to="/reviews">Reviews</Link>
-            </li>
-          </ul>
-
-          {/* Right - Social icons */}
-          <div>
-            <a href="#" className="text-light me-3">
-              <i className="bi bi-facebook"></i>
-            </a>
-            <a href="#" className="text-light me-3">
-              <i className="bi bi-twitter"></i>
-            </a>
-            <a href="#" className="text-light">
-              <i className="bi bi-linkedin"></i>
-            </a>
-          </div>
-          
+      <footer className="footer bg-dark text-light pt-5 pb-4 mt-5">
+  <div className="container">
+    <div className="row gy-4">
+      {/* Brand & About */}
+      <div className="col-12 col-md-5">
+        <div className="d-flex align-items-center mb-2">
+          <img src={logo} alt="Logo" style={{ height: "38px", marginRight: "12px" }} />
+          <span className="fs-5 fw-bold">AI Solutions</span>
         </div>
-      </footer>
+        <p className="small text-secondary mb-3">
+          Empowering businesses with AI, automation, and modern IT solutions. We help you innovate, grow, and lead in your industry.
+        </p>
+        <div className="d-flex align-items-center mb-2">
+          <FaMapMarkerAlt className="me-2" />
+          <span className="small">Butwal-11, Kalikanagar</span>
+        </div>
+        <div className="d-flex align-items-center mb-2">
+          <FaEnvelope className="me-2" />
+          <a href="mailto:info@aisolutions.com" className="small text-light text-decoration-none">info@aisolutions.com</a>
+        </div>
+        <div className="d-flex align-items-center mb-2">
+          <FaPhoneAlt className="me-2" />
+          <a href="tel:+977-9800000000" className="small text-light text-decoration-none">+977-9800000000</a>
+        </div>
+        <div className="mt-3">
+          <a href="#" className="text-light me-3 fs-5"><FaFacebookF /></a>
+          <a href="#" className="text-light me-3 fs-5"><FaTwitter /></a>
+          <a href="#" className="text-light fs-5"><FaLinkedinIn /></a>
+        </div>
+      </div>
+      {/* Quick Links */}
+      <div className="col-6 col-md-3">
+        <h6 className="fw-bold mb-3">Quick Links</h6>
+        <ul className="list-unstyled">
+          <li><Link className="footer-link" to="/services">Services</Link></li>
+          <li><Link className="footer-link" to="/blog">Blog</Link></li>
+          <li><Link className="footer-link" to="/events">Events</Link></li>
+          <li><Link className="footer-link" to="/projects">Projects</Link></li>
+          <li><Link className="footer-link" to="/contact">Contact</Link></li>
+          <li><Link className="footer-link" to="/reviews">Reviews</Link></li>
+        </ul>
+      </div>
+      {/* Company */}
+      <div className="col-6 col-md-4">
+        <h6 className="fw-bold mb-3">Company</h6>
+        <ul className="list-unstyled">
+          <li><Link className="footer-link" to="/about">About Us</Link></li>
+          <li><Link className="footer-link" to="/privacy">Privacy Policy</Link></li>
+          <li><Link className="footer-link" to="/terms">Terms of Service</Link></li>
+        </ul>
+      </div>
+    </div>
+    <hr className="my-4 border-secondary" />
+    <div className="d-flex flex-column flex-md-row justify-content-between align-items-center">
+      <span className="small text-secondary mb-2 mb-md-0">
+        © {new Date().getFullYear()} AI Solutions. All rights reserved.
+      </span>
+    </div>
+  </div>
+</footer>
       <Chatbot />
     </>
   );

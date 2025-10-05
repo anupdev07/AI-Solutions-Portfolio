@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/Services.css";
-import { FaDotCircle, FaIndustry, FaRegAddressBook, FaRegAddressCard, FaUser, FaUserCircle } from "react-icons/fa";
+import { FaRegAddressBook, FaMapMarkerAlt, FaTools, FaUserCircle } from "react-icons/fa";
 
 export default function Home() {
   const API_URL = "http://localhost:5000";
@@ -11,17 +11,15 @@ export default function Home() {
   const [services, setServices] = useState([]);
   const [events, setEvents] = useState([]);
   const today = new Date();
-  const upcoming = events.filter((e) => new Date(e.date) >= today);
   const [projects, setProjects] = useState([]);
-useEffect(() => {
-  axios.get(`${API_URL}/api/projects`).then((res) => {
-    setProjects(res.data);
-  });
-}, []);
+  const [reviews, setReviews] = useState([]);
 
-  function formatDate(date) {
-    return new Date(date).toLocaleDateString();
-  }
+  useEffect(() => {
+    axios.get(`${API_URL}/api/projects`).then((res) => {
+      setProjects(res.data);
+    });
+  }, []);
+
   useEffect(() => {
     fetchBlogs();
     fetchServices();
@@ -55,23 +53,25 @@ useEffect(() => {
       console.error("Error fetching events:", err);
     }
   }
-  const [reviews, setReviews] = useState([]);
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
   async function fetchReviews() {
     try {
       const res = await axios.get(`${API_URL}/api/reviews`);
-  setReviews(res.data.filter((r) => r.status === "approved")); // only approved reviews
+      setReviews(res.data.filter((r) => r.status === "approved"));
     } catch (err) {
       console.error("Error fetching reviews:", err);
     }
   }
 
+  function formatDate(date) {
+    return new Date(date).toLocaleDateString();
+  }
+
+  const upcoming = events.filter((e) => new Date(e.date) >= today);
+
   const topReviews = reviews
     .sort((a, b) => b.rating - a.rating)
-    .slice(0, 3); // Top 3 reviews by rating
+    .slice(0, 3);
 
   return (
     <div className="container py-5">
@@ -161,19 +161,36 @@ useEffect(() => {
           <p className="text-center text-muted">No services available yet.</p>
         ) : (
           services.map((s) => (
-            <div key={s._id} className="col-12 col-md-6 col-lg-4">
-              <div className="service-card">
+            <div key={s._id} className="col-12 col-md-6 col-lg-4 d-flex">
+              <div className="service-card-modern flex-fill d-flex flex-column align-items-center text-center shadow-lg rounded-4 p-4 bg-dark position-relative h-100">
                 {s.icon && (
-                  <img
-                    src={`${API_URL}/uploads/blogs/${s.icon}`}
-                    alt="icon"
-                    className="service-icon"
-                  />
+                  <div className="service-icon-circle mb-3">
+                    <img
+                      src={`${API_URL}/uploads/blogs/${s.icon}`}
+                      alt="icon"
+                      className="service-icon-img"
+                    />
+                  </div>
                 )}
-                <h4>{s.title}</h4>
-                <p className="service-desc">{s.description}</p>
-                <a href="/contact" >
-                <span className="service-badge">{s.category}</span> </a>
+                <h4 className="fw-bold mb-2" style={{ color: "#fff" }}>
+                  {s.title}
+                </h4>
+                <span className="service-badge-modern mb-3">
+                  {s.category}
+                </span>
+                <p
+                  className="service-desc mb-4"
+                  style={{ color: "#ccc" }}
+                >
+                  {s.description}
+                </p>
+                <a
+                  href="/contact"
+                  className="btn btn-outline-warning rounded-pill px-4 fw-semibold mt-auto"
+                  style={{ borderColor: "#ff4d29", color: "#ffb366" }}
+                >
+                  Get Started
+                </a>
               </div>
             </div>
           ))
@@ -227,17 +244,14 @@ useEffect(() => {
 
               <div className="card-body mt-4">
                 <h5 className="card-title">{p.title}</h5>
-                <p className="text small mb-2 italic"><FaRegAddressBook/> {p.clientName}</p>
+                <p className="text small mb-2 italic"><FaRegAddressBook /> {p.clientName}</p>
                 <p className="card-text">{p.summary}</p>
-                {/* add https:// in links if not present */}
-                <a
-                  href={p.link.startsWith("https://") ? p.link : `https://${p.link}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/projects"
                   className="btn btn-outline-light btn-sm mt-2"
                 >
-                  View Project
-                </a>
+                  Read More
+                </Link>
               </div>
             </div>
           </div>
@@ -245,9 +259,9 @@ useEffect(() => {
     )}
   </div>
   <div className="text-center mt-4">
-    <a href="/projects" className="btn btn-outline-light">
+    <Link to="/projects" className="btn btn-outline-light">
       See More Projects
-    </a>
+    </Link>
   </div>
 </div>
 
@@ -271,16 +285,35 @@ useEffect(() => {
                   )}
                   <div className="card-body">
                     <h5>{b.title}</h5>
-                    <p>{b.excerpt}</p>
+                    <p style={{ color: "#e6e6e6" }}>{b.excerpt}</p>
+                    <div className="d-flex align-items-center mb-2">
+                      <div
+                        className="me-2 d-flex align-items-center justify-content-center"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          background: "#23272b",
+                          color: "#FFD700",
+                          fontWeight: 700,
+                          fontSize: "1.1rem",
+                          border: "1.5px solid #FFD700",
+                        }}
+                      >
+                        {(b.author?.username || "A")[0].toUpperCase()}
+                      </div>
+                      <span className="small text-white-50">
+                       {b.author?.username || b.author || "Admin"} &bull;{" "}
+                      {new Date(b.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
                     <center>
-                    <Link to={`/blog/${b.slug}`} className="btn btn-outline-light">
-                      Read More
-                    </Link>
+                      <Link to={`/blog/${b.slug}`} className="btn btn-outline-light">
+                        Read More
+                      </Link>
                     </center>
                   </div>
-                  
                 </div>
-                
               </div>
             ))
           )}
@@ -295,43 +328,40 @@ useEffect(() => {
       {/* Events Section */}
       <section className="py-5">
         <h2 className="mb-4 text-center">Upcoming Events</h2>
-        {/* only upcoming events fetched from database and check date for confirming it is upcoming */}
         <div className="row">
-                  {upcoming.length === 0 ? (
-                    <p>No upcoming events.</p>
-                  ) : (
-                    upcoming.map((event) => (
-                      <div key={event._id} className="col-md-4 mb-4">
-                        <div className="card upcoming-card h-100">
-                          {event.coverImage && (
-                            <img
-                              src={`${API_URL}/uploads/events/${event.coverImage}`}
-                              alt={event.title}
-                              className="card-img-top"
-                              style={{ height: "200px", objectFit: "cover" }}
-                            />
-                          )}
-                          <div className="card-body text-light">
-                            <h5 className="card-title">{event.title}</h5>
-                            <p className="card-text">
-                              📅 {formatDate(event.date)} <br />
-                              📍 {event.venue}
-                            </p>
-                            <p className="small text">"{event.description}"</p>
-                            <Link
-                              to={`/events/${event._id}`}
-                              className="btn btn-outline-light"
-                            >
-                              More Details
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    ))
+          {upcoming.length === 0 ? (
+            <p>No upcoming events.</p>
+          ) : (
+            upcoming.map((event) => (
+              <div key={event._id} className="col-md-4 mb-4">
+                <div className="card upcoming-card h-100">
+                  {event.coverImage && (
+                    <img
+                      src={`${API_URL}/uploads/events/${event.coverImage}`}
+                      alt={event.title}
+                      className="card-img-top"
+                      style={{ height: "200px", objectFit: "cover" }}
+                    />
                   )}
+                  <div className="card-body text-light">
+                    <h5 className="card-title">{event.title}</h5>
+                    <p className="card-text">
+                      📅 {formatDate(event.date)} <br />
+                      📍 {event.venue}
+                    </p>
+                    <p className="small text">"{event.description}"</p>
+                    <Link
+                      to={`/events/${event._id}`}
+                      className="btn btn-outline-light"
+                    >
+                      More Details
+                    </Link>
+                  </div>
                 </div>
-
-
+              </div>
+            ))
+          )}
+        </div>
         <div className="text-center mt-3">
           <Link to="/events" className="btn btn-outline-light">
             See More
@@ -391,8 +421,6 @@ useEffect(() => {
               </div>
             )))}
           {topReviews.length === 0 && (<p className="text-center">No reviews yet.</p>)}
-        </div>
-        <div className="text-center mt-3">
         </div>
         <div className="text-center mt-3">
           <Link to="/reviews" className="btn btn-outline-light">

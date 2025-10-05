@@ -8,14 +8,26 @@ const KB = [
     a: "Hello! 👋 I'm the AI-Solutions assistant. I can help with services, contact info, blogs, events, and navigation. What would you like to know?",
   },
   {
-    q: ["what is ai-solutions?", "ai-solutions?", "tell me about ai-solutions"],
+    q: ["what is ai-solutions?", "ai-solutions?", "tell me about ai-solutions", "about","about you"],
     a: "AI-Solutions is a tech company specializing in AI-driven solutions, web development, and application prototyping. We help businesses leverage technology for growth.",
   },
   {
-    q: ["services", "what do you offer", "offerings", "what can you do"],
+    q: ["where are you located", "location", "address", "headquarters", "where to find you"],
+    a: "We are based in Butwal-11, Kalikanagar | Nepal but we work with clients globally. For visits, please schedule an appointment via the Contact page.",
+  },
+  {
+    q: ["who developed you", "who made you", "developer", "creator", "about the developer"],
+    a: "I was developed by Anup Bhattarai, student at ISMT College Butwal and a passionate developer. You can learn more about him on https://github.com/anupdev07 or https://www.linkedin.com/in/anup-bhattarai-242aab241/.",
+  }, 
+  {
+    q: ["services","service", "what do you offer", "offerings", "what can you do"],
     a: "We provide Web Development, AI solutions (chatbots, ML models), Application Prototyping, and Consultation. See the Services page for details.",
   },
-  
+
+  {
+    q: ["payment", "payment options", "how to pay", "billing"],
+    a: "We accept various payment methods including credit cards, bank transfers, and digital wallets. For detailed billing inquiries, please contact our support.",
+  },
   {
     q: ["contact", "how to contact", "email", "phone", "reach you"],
     a: "You can contact us via the Contact page or email info@ai-solutions.example. We usually respond within 1-2 business days.",
