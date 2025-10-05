@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import logo from "./assets/logo.png";
+import Chatbot from "./components/ChatBot";  
 
 function App() {
   const navigate = useNavigate();
@@ -141,6 +142,7 @@ function App() {
           
         </div>
       </footer>
+      <Chatbot />
     </>
   );
 }

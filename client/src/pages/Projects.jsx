@@ -191,6 +191,7 @@ export default function Projects() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="btn btn-outline-warning btn-sm mt-2"
+                          
                         >
                           View Project <FaExternalLinkAlt className="ms-1" />
                         </a>
