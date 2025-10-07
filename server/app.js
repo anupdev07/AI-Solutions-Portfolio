@@ -24,7 +24,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Sample test route
 app.get("/", (req, res) => {
-  res.send("API is working 🚀");
+  res.send("API is working ");
 });
 
 // Main API routes

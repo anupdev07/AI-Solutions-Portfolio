@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import logo from "./assets/logo.png";
-import Chatbot from "./components/ChatBot";  
+import Chatbot from "./components/Chatbot";  
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt } from "react-icons/fa";
 import axios from "axios";
 // import "./styles/global.css";
