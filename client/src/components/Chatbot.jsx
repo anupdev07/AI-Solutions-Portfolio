@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "../styles/Chatbot.css";
+import "../styles/ChatBot.css";
 import { FaAssistiveListeningSystems, FaPersonBooth, FaRobot } from "react-icons/fa";
 
 const KB = [
