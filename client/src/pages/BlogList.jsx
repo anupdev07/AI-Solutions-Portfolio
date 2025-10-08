@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 export default function Blog() {
   const [blogs, setBlogs] = useState([]);
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchBlogs();

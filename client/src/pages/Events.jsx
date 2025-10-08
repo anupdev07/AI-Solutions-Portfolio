@@ -5,7 +5,7 @@ import "../styles/Events.css"; // new css file for glow effect
 
 export default function Events() {
   const [events, setEvents] = useState([]);
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchEvents();

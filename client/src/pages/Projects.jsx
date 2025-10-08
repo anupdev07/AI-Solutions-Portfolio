@@ -5,7 +5,7 @@ import { FaAddressBook, FaCalendarAlt, FaMapMarkerAlt, FaStar, FaTools, FaExtern
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchProjects();

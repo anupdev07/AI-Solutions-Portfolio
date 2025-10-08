@@ -5,7 +5,7 @@ import "../styles/Services.css";
 import { FaRegAddressBook, FaMapMarkerAlt, FaTools, FaUserCircle } from "react-icons/fa";
 
 export default function Home() {
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   const [blogs, setBlogs] = useState([]);
   const [services, setServices] = useState([]);

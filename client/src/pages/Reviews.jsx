@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 
 export default function Reviews() {
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
   const navigate = useNavigate();
 
   const [reviews, setReviews] = useState([]);

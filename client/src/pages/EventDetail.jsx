@@ -5,7 +5,7 @@ import axios from "axios";
 export default function EventDetail() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchEvent();

@@ -26,7 +26,7 @@ export default function AdminPanel() {
   const navigate = useNavigate();
 
   // API base - change if your backend is on another host/port
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [blogs, setBlogs] = useState([]);

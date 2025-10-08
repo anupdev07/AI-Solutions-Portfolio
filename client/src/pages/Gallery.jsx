@@ -7,7 +7,7 @@ export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [fullscreenImg, setFullscreenImg] = useState(null);
 
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchEvents();

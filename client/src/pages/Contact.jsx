@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaLinkedin, FaFacebook, FaTwitter, FaUser } from "react-icons/fa";
 export default function Contact() {
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
   const [formData, setFormData] = useState({
     name: "",
     email: "",

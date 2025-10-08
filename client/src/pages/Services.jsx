@@ -4,7 +4,7 @@ import "../styles/Services.css";
 
 export default function Services() {
   const [services, setServices] = useState([]);
-  const API_URL = "http://localhost:5000";
+  const API_URL = "https://ai-solutions-portfolio.onrender.com";
 
   useEffect(() => {
     fetchServices();
