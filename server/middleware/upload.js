@@ -1,34 +1,45 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// Storage engine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/blogs");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+function ensureDirSync(dir) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
 
-// File filter (accept only images)
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+function storageFor(type) {
+  return multer.diskStorage({
+    destination(req, file, cb) {
+      // uploads/<type> relative to project root/server/uploads/<type>
+      const uploadBase = path.join(__dirname, "..", "uploads");
+      const dest = path.join(uploadBase, type);
+      ensureDirSync(dest);
+      cb(null, dest);
+    },
+    filename(req, file, cb) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      const safeName = file.fieldname.replace(/\s+/g, "-");
+      const filename = `${safeName}-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+      cb(null, filename);
+    },
+  });
+}
 
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb("Error: Images only!");
-  }
-};
+function imageFileFilter(req, file, cb) {
+  const allowed = /jpeg|jpg|png|webp|gif/;
+  const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
+  if (allowed.test(ext)) cb(null, true);
+  else cb(new Error("Only image files are allowed (jpg, jpeg, png, webp, gif)"));
+}
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter
-});
+/**
+ * uploadTo(type, options)
+ * returns a multer instance configured to save files to uploads/<type>
+ * usage in routes: uploadTo('blogs').single('coverImage'), uploadTo('events').array('images', 10)
+ */
+function uploadTo(type, options = {}) {
+  const storage = storageFor(type);
+  const limits = options.limits || { fileSize: 5 * 1024 * 1024 }; // default 5MB
+  return multer({ storage, fileFilter: imageFileFilter, limits });
+}
 
-module.exports = upload;
+module.exports = { uploadTo };

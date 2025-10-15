@@ -1,21 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const {
-  createService,
-  getServices,
-  deleteService,
-} = require("../controllers/serviceController");
+const { uploadTo } = require("../middleware/upload");
+const auth = require("../middleware/authMiddleware");
+const serviceController = require("../controllers/serviceController");
 
-const { authMiddleware, adminMiddleware } = require("../middleware/authMiddleware");
-const upload = require("../middleware/upload");
+// create service - icon goes to uploads/services
+router.post(
+  "/",
+  auth,
+  uploadTo("services").single("icon"),
+  serviceController.createService
+);
 
-// GET all services (public)
-router.get("/", getServices);
-
-
-router.post("/", authMiddleware, adminMiddleware, upload.single("icon"), createService);
-
-// DELETE service (admin only)
-router.delete("/:id", authMiddleware, adminMiddleware, deleteService);
+// update service - allow icon replacement
+router.put(
+  "/:id",
+  auth,
+  uploadTo("services").single("icon"),
+  serviceController.updateService
+);
 
 module.exports = router;

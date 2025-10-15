@@ -1,32 +1,35 @@
 const Blog = require("../models/Blog");
-const slugify = require("slugify");
+const fs = require("fs");
+const path = require("path");
+
+function removeFileIfExists(filename, folder) {
+  if (!filename) return;
+  const p = path.join(__dirname, "..", "uploads", folder, filename);
+  fs.access(p, fs.constants.F_OK, (err) => {
+    if (!err) fs.unlink(p, () => {});
+  });
+}
 
 // Create Blog
 exports.createBlog = async (req, res) => {
   try {
-    const { title, content, excerpt, tags, author } = req.body;
-
-    if (!title || !content || !excerpt) {
-      return res.status(400).json({ msg: "Title, content, and excerpt are required" });
-    }
-
-    const slug = slugify(title, { lower: true, strict: true });
+    const { title, excerpt, content, tags, author } = req.body;
+    const coverImage = req.file?.filename || undefined;
 
     const blog = new Blog({
       title,
-      slug,
       excerpt,
       content,
-      tags: tags ? tags.split(",").map(t => t.trim()) : [],
-      author, // <-- use manual author
-      coverImage: req.file ? req.file.filename : undefined,
+      tags: tags ? tags.split(",").map((t) => t.trim()) : [],
+      author: author || (req.user && req.user.username) || "Admin",
+      coverImage,
     });
 
     await blog.save();
     res.json(blog);
-  } catch (error) {
-    console.error("Error creating blog:", error);
-    res.status(500).json({ msg: "Server error" });
+  } catch (err) {
+    console.error("createBlog:", err);
+    res.status(500).json({ msg: "Failed to create blog" });
   }
 };
 // Get All Blogs
@@ -56,34 +59,30 @@ exports.getBlog = async (req, res) => {
 // Update Blog
 exports.updateBlog = async (req, res) => {
   try {
-    const { title, content, excerpt, tags, author } = req.body;
+    const id = req.params.id;
+    const { title, excerpt, content, tags, author } = req.body;
 
-    let slug;
-    if (title) slug = slugify(title, { lower: true, strict: true });
-
-    const updateData = {
+    const update = {
       title,
-      slug,
       excerpt,
       content,
-      tags: tags ? tags.split(",").map(t => t.trim()) : [],
-      author, // <-- use manual author
+      tags: tags ? tags.split(",").map((t) => t.trim()) : [],
     };
 
-    if (req.file) {
-      updateData.coverImage = req.file.filename;
+    // handle cover image replacement (single file)
+    if (req.file?.filename) {
+      const existing = await Blog.findById(id).select("coverImage");
+      if (existing?.coverImage) removeFileIfExists(existing.coverImage, "blogs");
+      update.coverImage = req.file.filename;
     }
 
-    const blog = await Blog.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true
-    });
+    if (author) update.author = author;
 
-    if (!blog) return res.status(404).json({ msg: "Blog not found" });
+    const blog = await Blog.findByIdAndUpdate(id, update, { new: true });
     res.json(blog);
-  } catch (error) {
-    console.error("Error updating blog:", error);
-    res.status(500).json({ msg: "Server error" });
+  } catch (err) {
+    console.error("updateBlog:", err);
+    res.status(500).json({ msg: "Failed to update blog" });
   }
 };
 
@@ -91,9 +90,10 @@ exports.updateBlog = async (req, res) => {
 exports.deleteBlog = async (req, res) => {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
-    if (!blog) return res.status(404).json({ msg: "Blog not found" });
-    res.json({ msg: "Blog deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ msg: "Server error" });
+    if (blog?.coverImage) removeFileIfExists(blog.coverImage, "blogs");
+    res.json({ msg: "Deleted" });
+  } catch (err) {
+    console.error("deleteBlog:", err);
+    res.status(500).json({ msg: "Delete failed" });
   }
 };

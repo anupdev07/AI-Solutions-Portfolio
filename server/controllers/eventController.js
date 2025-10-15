@@ -2,44 +2,36 @@ const Event = require("../models/Event");
 const fs = require("fs");
 const path = require("path");
 
-// Helper to delete file (if exists)
-function deleteFileIfExists(filePath) {
-  try {
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch (err) {
-    console.error("Error deleting file:", filePath, err.message);
-  }
+function removeFileIfExists(filename, folder) {
+  if (!filename) return;
+  const p = path.join(__dirname, "..", "uploads", folder, filename);
+  fs.access(p, fs.constants.F_OK, (err) => {
+    if (!err) fs.unlink(p, () => {});
+  });
 }
 
 // Create new event (cover + multiple images)
 exports.createEvent = async (req, res) => {
   try {
     const { title, description, details, date, venue, category } = req.body;
+    const coverImage = req.file?.filename || undefined;
 
-    if (!title || !description || !date) {
-      return res.status(400).json({ msg: "Title, description and date are required" });
-    }
-
-    // files: req.files is an object when using upload.fields()
-    const coverImage = req.files?.coverImage?.[0]?.filename || null;
-    const images = req.files?.images ? req.files.images.map((f) => f.filename) : [];
-
-    const ev = new Event({
+    const event = new Event({
       title,
       description,
       details,
-      date: new Date(date),
+      date,
       venue,
-      category: category || title.replace(/\s+/g, ""),
+      category,
       coverImage,
-      images,
+      images: [], // images added via separate endpoint
     });
 
-    await ev.save();
-    res.status(201).json(ev);
+    await event.save();
+    res.json(event);
   } catch (err) {
-    console.error("createEvent error:", err);
-    res.status(500).json({ msg: "Server error" });
+    console.error("createEvent:", err);
+    res.status(500).json({ msg: "Failed to create event" });
   }
 };
 
@@ -77,71 +69,53 @@ exports.getEvent = async (req, res) => {
 // Update event (fields + optional cover replacement)
 exports.updateEvent = async (req, res) => {
   try {
-    const ev = await Event.findById(req.params.id);
-    if (!ev) return res.status(404).json({ msg: "Event not found" });
-
+    const id = req.params.id;
     const { title, description, details, date, venue, category } = req.body;
+    const update = { title, description, details, date, venue, category };
 
-    if (title) ev.title = title;
-    if (description) ev.description = description;
-    if (details) ev.details = details;
-    if (date) ev.date = new Date(date);
-    if (venue) ev.venue = venue;
-    if (category) ev.category = category;
-
-    // replace cover image if provided
-    if (req.file) {
-      // req.file when using upload.single('coverImage') or upload.fields...
-      const oldCover = ev.coverImage ? path.join(__dirname, "..", "uploads", "events", ev.coverImage) : null;
-      ev.coverImage = req.file.filename;
-      if (oldCover) deleteFileIfExists(oldCover);
+    if (req.file?.filename) {
+      const existing = await Event.findById(id).select("coverImage");
+      if (existing?.coverImage) removeFileIfExists(existing.coverImage, "events");
+      update.coverImage = req.file.filename;
     }
 
-    await ev.save();
-    res.json(ev);
+    const event = await Event.findByIdAndUpdate(id, update, { new: true });
+    res.json(event);
   } catch (err) {
-    console.error("updateEvent error:", err);
-    res.status(500).json({ msg: "Server error" });
+    console.error("updateEvent:", err);
+    res.status(500).json({ msg: "Failed to update event" });
   }
 };
 
 // Add more images to existing event (req.files: images[])
 exports.addImages = async (req, res) => {
   try {
-    const ev = await Event.findById(req.params.id);
-    if (!ev) return res.status(404).json({ msg: "Event not found" });
+    const id = req.params.id;
+    const files = req.files || [];
+    const filenames = files.map((f) => f.filename);
 
-    const newImages = req.files ? req.files.map((f) => f.filename) : [];
-    ev.images = ev.images.concat(newImages);
-    await ev.save();
-    res.json(ev);
+    const event = await Event.findByIdAndUpdate(
+      id,
+      { $push: { images: { $each: filenames } } },
+      { new: true }
+    );
+    res.json(event);
   } catch (err) {
-    console.error("addImages error:", err);
-    res.status(500).json({ msg: "Server error" });
+    console.error("addImages:", err);
+    res.status(500).json({ msg: "Failed to add images" });
   }
 };
 
 // Delete a specific image from an event (and filesystem)
 exports.deleteImage = async (req, res) => {
   try {
-    const { id, imgName } = req.params;
-    const ev = await Event.findById(id);
-    if (!ev) return res.status(404).json({ msg: "Event not found" });
-
-    const idx = ev.images.indexOf(imgName);
-    if (idx === -1) return res.status(404).json({ msg: "Image not found in event" });
-
-    // remove from array and delete file
-    ev.images.splice(idx, 1);
-    await ev.save();
-
-    const filePath = path.join(__dirname, "..", "uploads", "events", imgName);
-    deleteFileIfExists(filePath);
-
-    res.json({ msg: "Image removed", event: ev });
+    const { id, imageName } = req.params;
+    await Event.findByIdAndUpdate(id, { $pull: { images: imageName } });
+    removeFileIfExists(imageName, "events");
+    res.json({ msg: "Image removed" });
   } catch (err) {
-    console.error("deleteImage error:", err);
-    res.status(500).json({ msg: "Server error" });
+    console.error("deleteImage:", err);
+    res.status(500).json({ msg: "Delete image failed" });
   }
 };
 
@@ -149,18 +123,13 @@ exports.deleteImage = async (req, res) => {
 exports.deleteEvent = async (req, res) => {
   try {
     const ev = await Event.findByIdAndDelete(req.params.id);
-    if (!ev) return res.status(404).json({ msg: "Event not found" });
-
-    // delete cover + images
-    const base = path.join(__dirname, "..", "uploads", "events");
-    if (ev.coverImage) deleteFileIfExists(path.join(base, ev.coverImage));
-    if (Array.isArray(ev.images)) {
-      ev.images.forEach((fn) => deleteFileIfExists(path.join(base, fn)));
+    if (ev?.coverImage) removeFileIfExists(ev.coverImage, "events");
+    if (Array.isArray(ev?.images)) {
+      ev.images.forEach((img) => removeFileIfExists(img, "events"));
     }
-
-    res.json({ msg: "Event deleted successfully" });
+    res.json({ msg: "Deleted" });
   } catch (err) {
-    console.error("deleteEvent error:", err);
-    res.status(500).json({ msg: "Server error" });
+    console.error("deleteEvent:", err);
+    res.status(500).json({ msg: "Delete failed" });
   }
 };

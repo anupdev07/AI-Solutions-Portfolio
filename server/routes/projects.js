@@ -1,66 +1,56 @@
 const express = require("express");
 const router = express.Router();
-const {
-  createProject,
-  getProjects,
-  getProject,
-  deleteProject,
-} = require("../controllers/projectController");
-
-const authMiddleware = require("../middleware/authMiddleware").authMiddleware;
-const adminOnly = require("../middleware/authMiddleware").adminMiddleware;
-const multer = require("multer");
-const path = require("path");
-
-// Storage config for project uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, "../uploads/projects"));
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + "-" + file.originalname);
-    },
-});
-
-const upload = multer({ storage });
+const { uploadTo } = require("../middleware/upload");
+const auth = require("../middleware/authMiddleware");
+const projectController = require("../controllers/projectController");
 
 // Public routes
-router.get("/", getProjects);
-router.get("/:id", getProject);
+router.get("/", projectController.getProjects);
+router.get("/:id", projectController.getProject);
 
-// Admin routes
+// create project - handle logo and coverImage (both saved to uploads/projects)
 router.post(
   "/",
-  authMiddleware,
-  adminOnly,
-  upload.fields([
+  auth,
+  uploadTo("projects").fields([
     { name: "logo", maxCount: 1 },
     { name: "coverImage", maxCount: 1 },
   ]),
-  createProject
+  projectController.createProject
 );
 
-router.delete("/:id", authMiddleware, adminOnly, deleteProject);
+// update project
+router.put(
+  "/:id",
+  auth,
+  uploadTo("projects").fields([
+    { name: "logo", maxCount: 1 },
+    { name: "coverImage", maxCount: 1 },
+  ]),
+  projectController.updateProject
+);
 
-  // Toggle featured status
-  router.patch(
-    "/:id/feature",
-    authMiddleware,
-    adminOnly,
-    async (req, res) => {
-      const { featured } = req.body;
-      try {
-        const project = await require("../models/Project").findByIdAndUpdate(
-          req.params.id,
-          { featured: !!featured },
-          { new: true }
-        );
-        if (!project) return res.status(404).json({ msg: "Not found" });
-        res.json(project);
-      } catch (err) {
-        res.status(500).json({ msg: "Server error" });
-      }
+// Admin routes
+router.delete("/:id", auth, projectController.deleteProject);
+
+// Toggle featured status
+router.patch(
+  "/:id/feature",
+  auth,
+  async (req, res) => {
+    const { featured } = req.body;
+    try {
+      const project = await require("../models/Project").findByIdAndUpdate(
+        req.params.id,
+        { featured: !!featured },
+        { new: true }
+      );
+      if (!project) return res.status(404).json({ msg: "Not found" });
+      res.json(project);
+    } catch (err) {
+      res.status(500).json({ msg: "Server error" });
     }
-  );
+  }
+);
 
 module.exports = router;
