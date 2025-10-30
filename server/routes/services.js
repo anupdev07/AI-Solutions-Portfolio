@@ -12,12 +12,18 @@ router.post(
   serviceController.createService
 );
 
-// update service - allow icon replacement
+// Get all services (public)
+router.get("/", serviceController.getServices);
+
+// Update service - allow icon replacement
 router.put(
   "/:id",
   auth,
   uploadTo("services").single("icon"),
   serviceController.updateService
 );
+
+// Delete service (admin)
+router.delete("/:id", auth, serviceController.deleteService);
 
 module.exports = router;
