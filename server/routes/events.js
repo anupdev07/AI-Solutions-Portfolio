@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { uploadTo } = require("../middleware/upload");
-const auth = require("../middleware/authMiddleware");
+const auth = require("../middleware/authMiddleware").authMiddleware;
 const eventController = require("../controllers/eventController");
 
 // Public: list events (optional ?upcoming=true)

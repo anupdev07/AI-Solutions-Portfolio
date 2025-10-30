@@ -11,7 +11,7 @@ function removeFileIfExists(filename, folder) {
 }
 
 // Create Blog
-exports.createBlog = async (req, res) => {
+async function createBlog(req, res) {
   try {
     const { title, excerpt, content, tags, author } = req.body;
     const coverImage = req.file?.filename || undefined;
@@ -31,9 +31,10 @@ exports.createBlog = async (req, res) => {
     console.error("createBlog:", err);
     res.status(500).json({ msg: "Failed to create blog" });
   }
-};
+}
+
 // Get All Blogs
-exports.getBlogs = async (req, res) => {
+async function getBlogs(req, res) {
   try {
     const blogs = await Blog.find()
       .populate("author", "username email")
@@ -42,22 +43,24 @@ exports.getBlogs = async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
-};
+}
 
 // Get Single Blog by Slug
-exports.getBlog = async (req, res) => {
+async function getBlog(req, res) {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug })
-      .populate("author", "username email");
+    const blog = await Blog.findOne({ slug: req.params.slug }).populate(
+      "author",
+      "username email"
+    );
     if (!blog) return res.status(404).json({ msg: "Blog not found" });
     res.json(blog);
   } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
-};
+}
 
 // Update Blog
-exports.updateBlog = async (req, res) => {
+async function updateBlog(req, res) {
   try {
     const id = req.params.id;
     const { title, excerpt, content, tags, author } = req.body;
@@ -84,10 +87,10 @@ exports.updateBlog = async (req, res) => {
     console.error("updateBlog:", err);
     res.status(500).json({ msg: "Failed to update blog" });
   }
-};
+} 
 
 // Delete Blog
-exports.deleteBlog = async (req, res) => {
+async function deleteBlog(req, res) {
   try {
     const blog = await Blog.findByIdAndDelete(req.params.id);
     if (blog?.coverImage) removeFileIfExists(blog.coverImage, "blogs");
@@ -96,4 +99,12 @@ exports.deleteBlog = async (req, res) => {
     console.error("deleteBlog:", err);
     res.status(500).json({ msg: "Delete failed" });
   }
+}
+
+module.exports = {
+  createBlog,
+  getBlogs,
+  getBlog,
+  updateBlog,
+  deleteBlog,
 };
